@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/conloot-gui/static/css/main.9d5b29c0.chunk.css",
+    "main.js": "/conloot-gui/static/js/main.4c5ec758.chunk.js",
+    "main.js.map": "/conloot-gui/static/js/main.4c5ec758.chunk.js.map",
+    "runtime-main.js": "/conloot-gui/static/js/runtime-main.b8cb1023.js",
+    "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.b8cb1023.js.map",
+    "static/js/2.b38dd0e4.chunk.js": "/conloot-gui/static/js/2.b38dd0e4.chunk.js",
+    "static/js/2.b38dd0e4.chunk.js.map": "/conloot-gui/static/js/2.b38dd0e4.chunk.js.map",
+    "static/js/3.5b64a142.chunk.js": "/conloot-gui/static/js/3.5b64a142.chunk.js",
+    "static/js/3.5b64a142.chunk.js.map": "/conloot-gui/static/js/3.5b64a142.chunk.js.map",
+    "index.html": "/conloot-gui/index.html",
+    "static/css/main.9d5b29c0.chunk.css.map": "/conloot-gui/static/css/main.9d5b29c0.chunk.css.map",
+    "static/js/2.b38dd0e4.chunk.js.LICENSE.txt": "/conloot-gui/static/js/2.b38dd0e4.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.b8cb1023.js",
+    "static/js/2.b38dd0e4.chunk.js",
+    "static/css/main.9d5b29c0.chunk.css",
+    "static/js/main.4c5ec758.chunk.js"
+  ]
+}
