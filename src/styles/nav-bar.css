@@ -1,0 +1,17 @@
+.nav-bar {
+    background-color: aquamarine;
+    padding: 5px 0;
+    margin: 5px 50px 10px;
+}
+
+.nav-bar-button {
+    background-color: bisque;
+    display: inline-block;
+    margin: 0 20px;
+    padding: 3px;
+}
+
+.nav-bar-button:hover {
+    transition: background-color 0.1s ease-in-out;
+    background-color: blueviolet;
+}

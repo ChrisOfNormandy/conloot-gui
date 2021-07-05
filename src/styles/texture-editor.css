@@ -1,0 +1,28 @@
+.texture-editor-container {
+    background-color: #666;
+    margin: 20px 50px;
+    padding: 20px;
+}
+
+.texture-editor-controls {
+    background-color: #555;
+}
+
+.rgb-input-container {
+    display: inline-block;
+    margin: 5px 10px;
+}
+
+.rgb-input-label {
+    margin-right: 5px;
+}
+
+.rgb-input-field {
+    border-radius: 10px;
+    text-align: center;
+    width: 32px;
+}
+
+#debug_check_label {
+    color: white;
+}

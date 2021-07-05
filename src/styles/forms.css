@@ -1,0 +1,56 @@
+.form-body {
+    grid-area: "form";
+    padding: 10px;
+}
+
+.form-input-list {
+    list-style-type: none;
+    margin: 0 auto;
+}
+
+.form-input-list-item {
+    width: 75%;
+    margin: 5px auto;
+    border: 1px solid black;
+    padding: 0 20px;
+}
+
+.form-input {
+    width: 100%;
+}
+
+.form-input-checkbox {
+    display: inline;
+}
+
+.form-checkbox-container {
+    display: flex;
+    align-content: space-between;
+}
+
+.form-button-container {
+    grid-area: "buttons";
+    width: 100%;
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-button {
+    margin: 0 20px;
+    width: 100%;
+    vertical-align: top;
+    display: inline-block;
+    *display: inline;
+    zoom: 1;
+    background-color: azure;
+}
+
+.form-button:hover {
+    transition: background-color 0.2s ease-in-out;
+    background-color: deepskyblue;
+}
+
+.form-input-submit {
+    grid-area: "submit";
+}
