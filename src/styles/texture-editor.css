@@ -23,6 +23,10 @@
     width: 32px;
 }
 
+.color-picker-display {
+    border: 1px solid white;
+}
+
 #debug_check_label {
     color: white;
 }

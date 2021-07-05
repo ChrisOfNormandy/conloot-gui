@@ -1,41 +1,67 @@
 import * as PIXI from 'pixi.js';
 import mouse from './common/Mouse';
 
-class Editor {
-    app = null;
+const loader = PIXI.Loader.shared,
+    Graphics = PIXI.Graphics
 
-    currentColor = {
+function decToHex (c) {
+    var hex = Number(c).toString(16);
+    return hex.length === 1 ? `0${hex}` : hex;
+}
+
+
+function rgbToHex (r, g, b) {
+    return Number(`0x${decToHex(r)}${decToHex(g)}${decToHex(b)}`);
+}
+
+const _ = {
+    app: null,
+
+    currentColor: {
         r: 0,
         g: 0,
         b: 0,
         a: 255
-    };
-    background = [];
+    },
 
-    width = 0;
-    height = 0;
-    scale = 0;
+    resolution: 0,
 
-    debug = false;
-    debugElem = document.getElementById('debug');
+    background:[],
 
-    pixels = [];
-    showGrid = false;
-    refresh = true;
+    width: 0,
+    height: 0,
+    scale : 0,
 
-    doBoundUpdate = true;
-    bounds = null;
+    debug : false,
+    debugElem : document.getElementById('debug'),
+    previewElem: null,
 
-    type = "WebGL";
+    pixels :[],
+    showGrid : false,
+    refresh : true,
 
-    loader = PIXI.Loader.shared;
-    Sprite = PIXI.Sprite;
-    Graphics = PIXI.Graphics;
+    doBoundUpdate : true,
+    bounds : null,
 
-    updateBounds = () => {
-        let canvasBounds = this.app.view.getBoundingClientRect();
+    type : "WebGL",
 
-        this.bounds = {
+    getCurrentColor: () => {
+        let rgba = _.currentColor;
+        _.previewElem.fillStyle = `rgb(${rgba.r}, ${rgba.g}, ${rgba.b})`;
+        _.previewElem.fillRect(0, 0, 32, 32);
+
+        return {
+            r: _.currentColor.r,
+            g: _.currentColor.g,
+            b: _.currentColor.b,
+            a: _.currentColor.a
+        }
+    },
+
+    updateBounds: () => {
+        let canvasBounds = _.app.view.getBoundingClientRect();
+
+        _.bounds = {
             x: canvasBounds.x,
             y: canvasBounds.y,
             left: canvasBounds.left,
@@ -46,163 +72,157 @@ class Editor {
             height: canvasBounds.height
         };
 
-        this.doBoundUpdate = false;
+        _.doBoundUpdate = false;
 
-        this.refresh = true;
-    }
+        _.refresh = true;
+    },
 
     /**
      * 
      * @param {PIXI.Application} app 
      * @returns {HTMLCanvasElement}
      */
-    startup = () => {
-        this.onReady(() => this.app.ticker.add(() => this.draw()));
+    startup: () => {
+        _.onReady(() => _.app.ticker.add(() => _.draw()));
 
-        return this.app.view;
-    }
+        return _.app.view;
+    },
 
-    onReady = (setup) => {
+    onReady: (setup) => {
         console.log('App ready. Loading.');
 
         if (!PIXI.utils.isWebGLSupported()) {
-            this.type = "canvas";
+            _.type = "canvas";
         }
 
-        PIXI.utils.sayHello(this.type);
+        PIXI.utils.sayHello(_.type);
 
-        this.loader
+        loader
             .load(setup);
-    }
+    },
 
-    updateDebug = () => {
-        if (this.debugElem === null)
-            this.debugElem = document.getElementById('debug');
+    updateDebug: () => {
+        if (_.debugElem === null)
+            _.debugElem = document.getElementById('debug');
 
-        if (!this.debug) {
-            this.debugElem.innerHTML = "";
+        if (!_.debug) {
+            _.debugElem.innerHTML = "";
             return;
         }
 
         let mousePos = mouse.getPosition();
 
-        this.debugElem.innerHTML =
-            `Mouse: ${JSON.stringify(mousePos)} --> ${Math.floor(mousePos.x / 16)}, ${Math.floor(mousePos.y / 16)}<br />` +
-            `Color: ${JSON.stringify(this.currentColor)}<br />` +
-            `0x${this.decToHex(this.currentColor.r)}${this.decToHex(this.currentColor.g)}${this.decToHex(this.currentColor.b)}`;
-    }
+        _.debugElem.innerHTML =
+            `Mouse: ${JSON.stringify(mousePos)} --> ${Math.floor(mousePos.x / _.resolution)}, ${Math.floor(mousePos.y / _.resolution)}<br />` +
+            `Color: ${JSON.stringify(_.currentColor)}<br />` +
+            `0x${_.decToHex(_.currentColor.r)}${_.decToHex(_.currentColor.g)}${_.decToHex(_.currentColor.b)}`;
+    },
 
-    draw = () => {
-        this.updateDebug();
+    draw: () => {
+        _.updateDebug();
 
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
-                if (this.refresh)
-                    this.setPixel(x, y, this.pixels[x][y].color);
+        for (let x = 0; x < _.resolution; x++) {
+            for (let y = 0; y < _.resolution; y++) {
+                if (_.refresh)
+                    _.setPixel(x, y, _.getPixel(x, y).color);
 
-                if (this.pixels[x][y].update) {
-                    console.log(x, y, this.pixels[x][y].color);
-                    this.app.stage.removeChild(this.pixels[x][y].graphic);
+                if (_.getPixel(x, y).update) {
+                    _.app.stage.removeChild(_.getPixel(x, y).graphic);
 
-                    if (this.pixels[x][y].color.a < 255)
-                        this.app.stage.addChild(this.background[y * 16 + x]);
+                    if (_.getPixel(x, y).color.a < 255)
+                        _.app.stage.addChild(_.background[y * _.resolution + x]);
                     else
-                        this.app.stage.removeChild(this.background[y * 16 + x]);
+                        _.app.stage.removeChild(_.background[y * _.resolution + x]);
 
-                    if (this.pixels[x][y].color.a > 0)
-                        this.app.stage.addChild(this.pixels[x][y].graphic);
+                    if (_.getPixel(x, y).color.a > 0)
+                        _.app.stage.addChild(_.getPixel(x, y).graphic);
 
-                    this.pixels[x][y].update = false;
+                    _.getPixel(x, y).update = false;
                 }
             }
         }
 
         if (mouse.button.state) {
             let pos = mouse.getPosition();
-            let x = Math.floor(pos.x / this.scale),
-                y = Math.floor(pos.y / this.scale);
+            let x = Math.floor(pos.x / _.scale),
+                y = Math.floor(pos.y / _.scale);
 
-            if (x >= 0 && x < 16 && y >= 0 && y < 16) {
+            if (x >= 0 && x < _.resolution && y >= 0 && y < _.resolution) {
                 if (mouse.button.id === 0)
-                    this.setPixel(x, y, this.currentColor);
+                    _.setPixel(x, y, _.getCurrentColor());
                 else if (mouse.button.id === 2)
-                    this.setPixel(x, y, { r: 0, g: 0, b: 0, a: 0 });
+                    _.setPixel(x, y, { r: 0, g: 0, b: 0, a: 0 });
 
-                this.getPixel(x, y).update = true;
+                _.getPixel(x, y).update = true;
             }
 
             if (!mouse.inBounds)
                 mouse.button.state = false;
         }
 
-        this.refresh = false;
-    }
+        _.refresh = false;
+    },
 
-    decToHex(c) {
-        var hex = Number(c).toString(16);
-        return hex.length === 1 ? `0${hex}` : hex;
-    }
-
-    clear() {
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
-                this.setPixel(x, y, null);
+    clear: () => {
+        for (let x = 0; x < _.resolution; x++) {
+            for (let y = 0; y < _.resolution; y++) {
+                _.setPixel(x, y, null);
             }
         }
-    }
+    },
 
-    rgbToHex(r, g, b) {
-        return Number(`0x${this.decToHex(r)}${this.decToHex(g)}${this.decToHex(b)}`);
-    }
+    getPixel: (x, y) => {
+        return !_.pixels[x] ? null : !_.pixels[x][y] ? null : _.pixels[x][y];
+    },
 
-    getPixel(x, y) {
-        return !this.pixels[x] ? null : !this.pixels[x][y] ? null : this.pixels[x][y];
-    }
-
-    setPixel(x, y, color) {
-        if (!this.pixels[x][y]) {
-            this.pixels[x][y] = {
+    setPixel: (x, y, color) => {
+        if (!_.getPixel(x, y)) {
+            _.pixels[x][y] = {
                 color,
-                graphic: new this.Graphics()
+                graphic: new Graphics()
             }
         }
 
-        this.pixels[x][y].graphic = new this.Graphics();
+        let pixel = _.getPixel(x, y)
 
-        if (this.showGrid)
-            this.pixels[x][y].graphic.lineStyle(1, 0x000000, 1);
+        pixel.graphic = new Graphics();
+
+        if (_.showGrid)
+            pixel.graphic.lineStyle(1, 0x000000, 1);
 
         if (color === null)
-            this.pixels[x][y].graphic.beginFill(0x000000);
+            pixel.graphic.beginFill(0x000000);
         else
-            this.pixels[x][y].graphic.beginFill(this.rgbToHex(color.r, color.g, color.b));
+            pixel.graphic.beginFill(rgbToHex(color.r, color.g, color.b));
 
-        this.pixels[x][y].graphic.drawRect(0, 0, this.scale, this.scale);
+        pixel.graphic.drawRect(0, 0, _.scale, _.scale);
 
-        this.pixels[x][y].graphic.endFill();
+        pixel.graphic.endFill();
 
-        this.pixels[x][y].graphic.alpha = color === null ? 0 : color.a / 255;
+        pixel.graphic.alpha = color === null ? 0 : color.a / 255;
 
-        this.pixels[x][y].graphic.x = x * this.scale;
-        this.pixels[x][y].graphic.y = y * this.scale;
+        pixel.graphic.x = x * _.scale;
+        pixel.graphic.y = y * _.scale;
 
-        this.pixels[x][y].update = true;
+        pixel.update = true;
 
-        return this.pixels[x][y];
-    }
+        pixel.color = color === null ? {r: 0, g: 0, b: 0, a: 0} : color;
 
-    compose = () => {
+        return pixel;
+    },
+
+    compose: () => {
         const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
-        canvas.width = 16;
-        canvas.height = 16;
+        canvas.width = _.resolution;
+        canvas.height = _.resolution;
 
-        let imgData = context.createImageData(16, 16);
+        let imgData = context.createImageData(_.resolution, _.resolution);
 
         let color;
-        for (let x = 0; x < 16; x++) {
-            for (let y = 0; y < 16; y++) {
-                let v = (y * 16 + x) * 4;
-                color = this.getPixel(x, y).color;
+        for (let x = 0; x < _.resolution; x++) {
+            for (let y = 0; y < _.resolution; y++) {
+                let v = (y * _.resolution + x) * 4;
+                color = _.getPixel(x, y).color;
 
                 imgData.data[v] = color.r;
                 imgData.data[v + 1] = color.g;
@@ -216,40 +236,57 @@ class Editor {
         const url = canvas.toDataURL('image/png');
         let link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'texture.png');
+        
+        let name = document.getElementById('image_name').value;
+        link.setAttribute('download', `${!!name ? name : 'texture'}.png`);
         link.click();
-    }
+    },
 
     /**
      * 
      * @param {PIXI.Application} app 
      */
-    constructor(app) {
-        this.app = app;
+    create: (app, resolution = 16) => {
+        _.app = app;
 
-        this.width = app.view.width;
-        this.height = app.view.height;
-        this.scale = this.width / 16;
+        _.previewElem = document.getElementById('color_picker_display').getContext('2d');
+        _.getCurrentColor();
 
-        this.pixels = [];
+        _.resolution = resolution
 
-        for (let x = 0; x < 16; x++) {
-            this.pixels[x] = [];
-            for (let y = 0; y < 16; y++) {
-                this.background[y * 16 + x] = new this.Graphics();
-                this.background[y * 16 + x].beginFill((x % 2 === 0 && y % 2 === 1) || (x % 2 === 1 && y % 2 === 0) ? 0xFFFFFF : 0xDDDDDD);
-                this.background[y * 16 + x].drawRect(0, 0, this.scale, this.scale);
-                this.background[y * 16 + x].endFill();
+        _.width = app.view.width;
+        _.height = app.view.height;
+        _.scale = _.width / _.resolution;
 
-                this.background[y * 16 + x].x = x * this.scale;
-                this.background[y * 16 + x].y = y * this.scale;
+        _.pixels = [];
 
-                this.setPixel(x, y, { r: 255 * x / 15, g: 0, b: 255 * y / 15, a: Math.floor((255 * x / 15 + 255 * y / 15) / 2) });
+        for (let x = 0; x < _.resolution; x++) {
+            _.pixels[x] = [];
+            for (let y = 0; y < _.resolution; y++) {
+                _.background[y * _.resolution + x] = new Graphics();
+                _.background[y * _.resolution + x].beginFill(0xFFFFFF);
+                _.background[y * _.resolution + x].drawRect(0, 0, _.scale, _.scale);
+                _.background[y * _.resolution + x].endFill();
+                _.background[y * _.resolution + x].tint = (x % 2 === 0 && y % 2 === 1) || (x % 2 === 1 && y % 2 === 0) ? 0xFFFFFF : 0xDDDDDD;
+
+                _.background[y * _.resolution + x].x = x * _.scale;
+                _.background[y * _.resolution + x].y = y * _.scale;
+
+                _.setPixel(x, y, {
+                    r: Math.floor(255 * x / (_.resolution - 1)),
+                    g: Math.floor(255 * ((x + y) / 2) / (_.resolution - 1)),
+                    b: Math.floor(255 * y / (_.resolution - 1)),
+                    a: Math.floor(255 - Math.abs(((255 * x / (_.resolution - 1) + 255 * y / (_.resolution - 1)) / 2) - 128))
+                });
             }
         }
+
+        return _;
     }
 }
 
+const editor = _;
+
 export {
-    Editor
+    editor
 }
