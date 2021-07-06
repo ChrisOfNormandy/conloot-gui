@@ -1,0 +1,35 @@
+.editor-container {
+    display: flex;
+    align-content: space-between;
+    height: 100%;
+}
+
+.texture-editor-container {
+    background-color: #666;
+    width: 100%;
+    border-top: 5px solid #DDD;
+    border-bottom: 5px solid #DDD;
+    display: flex;
+    flex-direction: column;
+}
+
+.texture-editor-wrapper {
+    padding: 20px;
+    height: 100%;
+}
+
+.texture-editor-controls {
+    height: fit-content;
+    background-color: #333;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.texture-editor-controls > label {
+    color: white;
+    margin-right: 10px;
+}
+
+#debug_check_label {
+    color: white;
+}

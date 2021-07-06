@@ -17,11 +17,11 @@ function rgbToHex (r, g, b) {
 const _ = {
     app: null,
 
-    currentColor: {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 255
+    brush: {
+        style: 'pencil',
+        fill: {
+            r: 0, g: 0, b: 0, a: 255
+        }
     },
 
     resolution: 0,
@@ -34,7 +34,6 @@ const _ = {
 
     debug : false,
     debugElem : document.getElementById('debug'),
-    previewElem: null,
 
     pixels :[],
     showGrid : false,
@@ -46,15 +45,11 @@ const _ = {
     type : "WebGL",
 
     getCurrentColor: () => {
-        let rgba = _.currentColor;
-        _.previewElem.fillStyle = `rgb(${rgba.r}, ${rgba.g}, ${rgba.b})`;
-        _.previewElem.fillRect(0, 0, 32, 32);
-
         return {
-            r: _.currentColor.r,
-            g: _.currentColor.g,
-            b: _.currentColor.b,
-            a: _.currentColor.a
+            r: _.brush.fill.r,
+            g: _.brush.fill.g,
+            b: _.brush.fill.b,
+            a: _.brush.fill.a
         }
     },
 
@@ -110,37 +105,36 @@ const _ = {
             return;
         }
 
-        let mousePos = mouse.getPosition();
+        let pos = mouse.getPosition();
+        let x = Math.floor(pos.x / _.scale),
+            y = Math.floor(pos.y / _.scale);
 
         _.debugElem.innerHTML =
-            `Mouse: ${JSON.stringify(mousePos)} --> ${Math.floor(mousePos.x / _.resolution)}, ${Math.floor(mousePos.y / _.resolution)}<br />` +
-            `Color: ${JSON.stringify(_.currentColor)}<br />` +
-            `0x${_.decToHex(_.currentColor.r)}${_.decToHex(_.currentColor.g)}${_.decToHex(_.currentColor.b)}`;
+            `Mouse: ${JSON.stringify(pos)} --> ${x}, ${y}<br />` +
+            `Color: ${JSON.stringify(_.brush.fill)} | 0x${decToHex(_.brush.fill.r)}${decToHex(_.brush.fill.g)}${decToHex(_.brush.fill.b)}<br />` +
+            `Buffer: ${_.buffer.length}`;
     },
+
+    buffer: [],
 
     draw: () => {
         _.updateDebug();
 
-        for (let x = 0; x < _.resolution; x++) {
-            for (let y = 0; y < _.resolution; y++) {
-                if (_.refresh)
-                    _.setPixel(x, y, _.getPixel(x, y).color);
-
-                if (_.getPixel(x, y).update) {
-                    _.app.stage.removeChild(_.getPixel(x, y).graphic);
-
-                    if (_.getPixel(x, y).color.a < 255)
-                        _.app.stage.addChild(_.background[y * _.resolution + x]);
-                    else
-                        _.app.stage.removeChild(_.background[y * _.resolution + x]);
-
-                    if (_.getPixel(x, y).color.a > 0)
-                        _.app.stage.addChild(_.getPixel(x, y).graphic);
-
-                    _.getPixel(x, y).update = false;
-                }
-            }
+        if (_.refresh) {
+            _.pixels.forEach(pixel => {
+                _.app.stage.removeChild(pixel.graphic);
+                _.setPixel(pixel.x, pixel.y, pixel.color);
+            });
+            _.refresh = false;
+            return;
         }
+
+        _.buffer.forEach((pixel, i) => {
+            pixel.graphic.tint = rgbToHex(pixel.color.r, pixel.color.g, pixel.color.b);
+            pixel.graphic.alpha = pixel.color.a;
+
+            _.buffer.splice(i, 1);
+        });
 
         if (mouse.button.state) {
             let pos = mouse.getPosition();
@@ -149,64 +143,71 @@ const _ = {
 
             if (x >= 0 && x < _.resolution && y >= 0 && y < _.resolution) {
                 if (mouse.button.id === 0)
-                    _.setPixel(x, y, _.getCurrentColor());
+                    _.updatePixel(x, y, _.getCurrentColor());
                 else if (mouse.button.id === 2)
-                    _.setPixel(x, y, { r: 0, g: 0, b: 0, a: 0 });
-
-                _.getPixel(x, y).update = true;
+                    _.updatePixel(x, y, { r: 0, g: 0, b: 0, a: 0 });
             }
 
             if (!mouse.inBounds)
                 mouse.button.state = false;
         }
 
-        _.refresh = false;
+        mouse.clicked = false;
     },
 
     clear: () => {
-        for (let x = 0; x < _.resolution; x++) {
-            for (let y = 0; y < _.resolution; y++) {
-                _.setPixel(x, y, null);
-            }
-        }
+        _.pixels.forEach(pixel => {
+            pixel.color = {r: 0, g: 0, b: 0, a: 0};
+            pixel.graphic.tint = 0x000000;
+            pixel.graphic.alpha = 0;
+        });
     },
 
     getPixel: (x, y) => {
-        return !_.pixels[x] ? null : !_.pixels[x][y] ? null : _.pixels[x][y];
+        return !_.pixels[y * _.resolution + x] ? null : _.pixels[y * _.resolution + x];
+    },
+
+    updatePixel: (x, y, color) => {
+        let pixel = _.getPixel(x, y);
+        if (pixel === null) {
+            console.error(x, y, color);
+            throw new Error('pause')
+        }
+        pixel.color = color;
+        _.buffer.push(pixel);
     },
 
     setPixel: (x, y, color) => {
         if (!_.getPixel(x, y)) {
-            _.pixels[x][y] = {
+            _.pixels[y * _.resolution + x] = {
                 color,
-                graphic: new Graphics()
+                graphic: null,
+                x,
+                y,
+                index: y * _.resolution + x
             }
         }
 
-        let pixel = _.getPixel(x, y)
+        let pixel = _.getPixel(x, y);
 
         pixel.graphic = new Graphics();
 
         if (_.showGrid)
             pixel.graphic.lineStyle(1, 0x000000, 1);
 
-        if (color === null)
-            pixel.graphic.beginFill(0x000000);
-        else
-            pixel.graphic.beginFill(rgbToHex(color.r, color.g, color.b));
-
+        pixel.graphic.beginFill(0xFFFFFF);
         pixel.graphic.drawRect(0, 0, _.scale, _.scale);
-
         pixel.graphic.endFill();
 
-        pixel.graphic.alpha = color === null ? 0 : color.a / 255;
+        pixel.graphic.tint = rgbToHex(color.r, color.g, color.b);
+        pixel.graphic.alpha = color.a / 255;
 
         pixel.graphic.x = x * _.scale;
         pixel.graphic.y = y * _.scale;
 
-        pixel.update = true;
-
         pixel.color = color === null ? {r: 0, g: 0, b: 0, a: 0} : color;
+
+        _.app.stage.addChild(pixel.graphic);
 
         return pixel;
     },
@@ -249,7 +250,6 @@ const _ = {
     create: (app, resolution = 16) => {
         _.app = app;
 
-        _.previewElem = document.getElementById('color_picker_display').getContext('2d');
         _.getCurrentColor();
 
         _.resolution = resolution
@@ -261,7 +261,6 @@ const _ = {
         _.pixels = [];
 
         for (let x = 0; x < _.resolution; x++) {
-            _.pixels[x] = [];
             for (let y = 0; y < _.resolution; y++) {
                 _.background[y * _.resolution + x] = new Graphics();
                 _.background[y * _.resolution + x].beginFill(0xFFFFFF);
@@ -271,6 +270,8 @@ const _ = {
 
                 _.background[y * _.resolution + x].x = x * _.scale;
                 _.background[y * _.resolution + x].y = y * _.scale;
+
+                _.app.stage.addChild(_.background[y * _.resolution + x])
 
                 _.setPixel(x, y, {
                     r: Math.floor(255 * x / (_.resolution - 1)),
