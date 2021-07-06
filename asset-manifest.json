@@ -1,22 +1,23 @@
 {
   "files": {
-    "main.css": "/conloot-gui/static/css/main.6cf68355.chunk.css",
-    "main.js": "/conloot-gui/static/js/main.781b81df.chunk.js",
-    "main.js.map": "/conloot-gui/static/js/main.781b81df.chunk.js.map",
-    "runtime-main.js": "/conloot-gui/static/js/runtime-main.45eefb0f.js",
-    "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.45eefb0f.js.map",
-    "static/js/2.e608c453.chunk.js": "/conloot-gui/static/js/2.e608c453.chunk.js",
-    "static/js/2.e608c453.chunk.js.map": "/conloot-gui/static/js/2.e608c453.chunk.js.map",
-    "static/js/3.091036ae.chunk.js": "/conloot-gui/static/js/3.091036ae.chunk.js",
-    "static/js/3.091036ae.chunk.js.map": "/conloot-gui/static/js/3.091036ae.chunk.js.map",
+    "main.css": "/conloot-gui/static/css/main.18acf271.chunk.css",
+    "main.js": "/conloot-gui/static/js/main.bff59291.chunk.js",
+    "main.js.map": "/conloot-gui/static/js/main.bff59291.chunk.js.map",
+    "runtime-main.js": "/conloot-gui/static/js/runtime-main.42f17684.js",
+    "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.42f17684.js.map",
+    "static/js/2.b84cdb62.chunk.js": "/conloot-gui/static/js/2.b84cdb62.chunk.js",
+    "static/js/2.b84cdb62.chunk.js.map": "/conloot-gui/static/js/2.b84cdb62.chunk.js.map",
+    "static/js/3.505d460b.chunk.js": "/conloot-gui/static/js/3.505d460b.chunk.js",
+    "static/js/3.505d460b.chunk.js.map": "/conloot-gui/static/js/3.505d460b.chunk.js.map",
     "index.html": "/conloot-gui/index.html",
-    "static/css/main.6cf68355.chunk.css.map": "/conloot-gui/static/css/main.6cf68355.chunk.css.map",
-    "static/js/2.e608c453.chunk.js.LICENSE.txt": "/conloot-gui/static/js/2.e608c453.chunk.js.LICENSE.txt"
+    "static/css/main.18acf271.chunk.css.map": "/conloot-gui/static/css/main.18acf271.chunk.css.map",
+    "static/js/2.b84cdb62.chunk.js.LICENSE.txt": "/conloot-gui/static/js/2.b84cdb62.chunk.js.LICENSE.txt",
+    "static/media/pencil.34dc5e45.svg": "/conloot-gui/static/media/pencil.34dc5e45.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.45eefb0f.js",
-    "static/js/2.e608c453.chunk.js",
-    "static/css/main.6cf68355.chunk.css",
-    "static/js/main.781b81df.chunk.js"
+    "static/js/runtime-main.42f17684.js",
+    "static/js/2.b84cdb62.chunk.js",
+    "static/css/main.18acf271.chunk.css",
+    "static/js/main.bff59291.chunk.js"
   ]
 }
