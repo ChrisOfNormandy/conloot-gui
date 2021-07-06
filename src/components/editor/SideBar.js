@@ -20,6 +20,11 @@ class SideBar extends React.Component {
                 className='side-bar-container'
             >
                 <div
+                    className='debug'
+                    id='debug'
+                />
+
+                <div
                     className='color-picker-container'
                 >
                     <div

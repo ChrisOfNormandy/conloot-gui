@@ -105,7 +105,7 @@ class TextureEditor extends React.Component {
             event.target.value = 255;
 
         let m = event.target.name.match(/rgb_([rgba])/)[1];
-        state.editor.brush.fill[m] = event.target.value === '' ? 0 : event.target.value;
+        state.editor.brush.fill[m] = event.target.value === '' ? 0 : Number(event.target.value);
         state.editor.getCurrentColor();
         this.setState(state);
     }
@@ -115,7 +115,7 @@ class TextureEditor extends React.Component {
             <div
                 className='editor-container'
             >
-                <Brushes />
+                <Brushes editor={this.state.editor}/>
 
                 <div
                     className='texture-editor-container'

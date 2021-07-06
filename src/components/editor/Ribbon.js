@@ -32,24 +32,24 @@ class Ribbon extends React.Component {
                     >
                         Download
                     </div>),
-                    (<div
-                        className='menu-break'
-                    />),
-                    (<form
-                        className='menu-button'
-                    >
-                        <input
-                            type='text'
-                            id='resolution_input'
-                            name='resolution'
-                            defaultValue='16'
-                        />
-                        <input
-                            type='submit'
-                            value='Create'
-                            onClick={this.setResolution}
-                        />
-                    </form>),
+                    // (<div
+                    //     className='menu-break'
+                    // />),
+                    // (<form
+                    //     className='menu-button'
+                    // >
+                    //     <input
+                    //         type='text'
+                    //         id='resolution_input'
+                    //         name='resolution'
+                    //         defaultValue='16'
+                    //     />
+                    //     <input
+                    //         type='submit'
+                    //         value='Create'
+                    //         onClick={this.setResolution}
+                    //     />
+                    // </form>),
                     (<div
                         className='menu-break'
                     />),

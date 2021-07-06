@@ -2,10 +2,25 @@
     background-color: #555;
     width: 64px;
     margin-left: 50px;
+    padding: 20px 1px;
     
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 
     border: 5px solid #DDD;
     border-right: 3px solid #222;
+}
+
+.brush-icon {
+    border-radius: 16px;
+    border: 1px solid #444;
+    padding: 2px;
+    width: 32px;
+    height: 32px;
+}
+
+.brush-icon:hover {
+    background-color: #666;
+    border: 1px solid #777;
+    transition: background-color 0.1s ease-in-out;
 }

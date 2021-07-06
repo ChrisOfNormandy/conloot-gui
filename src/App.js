@@ -8,9 +8,6 @@ function App() {
     <div className="App">
       <TextureEditor />
       {/* <ConfigForm /> */}
-      <div
-        id='debug'
-      />
     </div>
   );
 }
