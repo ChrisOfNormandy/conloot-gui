@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import mouse from './common/Mouse';
 
 import * as colorize from './helpers/colorize';
+import * as distance from './helpers/distance';
 
 const loader = PIXI.Loader.shared,
     Graphics = PIXI.Graphics
@@ -141,6 +142,10 @@ const _ = {
         mousePos: null,
         highlight: {
             x: 0, y: 0, graphic: null, focus: null
+        },
+        old: {
+            x: 0,
+            y: 0
         }
     },
 
@@ -172,6 +177,10 @@ const _ = {
         });
 
         _.painting.mousePos = mouse.getPosition();
+
+        _.painting.old.x = _.painting.highlight.x;
+        _.painting.old.y = _.painting.highlight.y;
+
         _.painting.highlight.x = Math.floor((_.painting.mousePos.x - (_.brush.size - 1) / 2 * _.scale) / _.scale);
         _.painting.highlight.y = Math.floor((_.painting.mousePos.y - (_.brush.size - 1) / 2 * _.scale) / _.scale);
 
@@ -185,7 +194,29 @@ const _ = {
             if (mouse.button.id === 0) {
                 for (let x = _.painting.highlight.x < 0 ? 0 : _.painting.highlight.x; x < _.painting.highlight.x + _.brush.size && x < _.resolution; x++) {
                     for (let y = _.painting.highlight.y < 0 ? 0 : _.painting.highlight.y; y < _.painting.highlight.y + _.brush.size && y < _.resolution; y++) {
-                        _.updatePixel(x, y, _.getCurrentColor());
+                        switch (_.brush.style) {
+                            case 'paint': {
+                                let color = _.getCurrentColor();
+                                color.a = Math.floor((1 - (distance.manhattan(
+                                    {
+                                        x: _.painting.highlight.x + Math.floor(_.brush.size / 2),
+                                        y: _.painting.highlight.y + Math.floor(_.brush.size / 2)
+                                    },
+                                    {
+                                        x, y
+                                    }
+                                ) / Math.round(_.brush.size / 2))) * 255);
+                                if (color.a < 0)
+                                    color.a = 0;
+
+                                _.updatePixel(x, y, color, _.painting.old.x !== _.painting.highlight.x || _.painting.old.y !== _.painting.highlight.y);
+                                break;
+                            }
+                            default: {
+                                _.updatePixel(x, y, _.getCurrentColor());
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -211,10 +242,13 @@ const _ = {
         return !_.pixels[y * _.resolution + x] ? null : _.pixels[y * _.resolution + x];
     },
 
-    updatePixel: (x, y, color) => {
+    updatePixel: (x, y, color, ignoreChange = false) => {
         let pixel = _.getPixel(x, y);
-        if (pixel === null || pixel.changed)
+        if (pixel === null || (pixel.changed && !ignoreChange))
             return;
+
+        if (ignoreChange)
+            console.log('here')
 
         pixel.color = colorize.calculatePixelColor(pixel.color, color);
         pixel.changed = true;

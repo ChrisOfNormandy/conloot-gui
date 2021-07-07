@@ -3,6 +3,7 @@ import React from "react";
 import './css/brushes.css';
 
 import pencil from '../../assets/pencil.svg';
+import paintbrush from '../../assets/paintbrush.svg';
 
 class Brushes extends React.Component {
 
@@ -13,7 +14,7 @@ class Brushes extends React.Component {
         },
         {
             key: 'paint',
-            icon: pencil
+            icon: paintbrush
         }
     ]
 
