@@ -30,7 +30,7 @@ const _ = {
     height: 0,
     scale: 0,
 
-    debug: true,
+    debug: false,
     debugElem: document.getElementById('debug'),
 
     pixels: [],
@@ -246,9 +246,6 @@ const _ = {
         let pixel = _.getPixel(x, y);
         if (pixel === null || (pixel.changed && !ignoreChange))
             return;
-
-        if (ignoreChange)
-            console.log('here')
 
         pixel.color = colorize.calculatePixelColor(pixel.color, color);
         pixel.changed = true;

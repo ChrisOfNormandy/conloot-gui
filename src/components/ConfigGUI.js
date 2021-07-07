@@ -135,7 +135,6 @@ class ConfigForm extends React.Component {
                                             onChange={this.updateName}
                                             required
                                             onKeyPress={(event) => {
-                                                console.log(event.key)
                                                 if (event.key.match(/[a-zA-Z_0-9]/) === null)
                                                     event.preventDefault();
                                             }}
