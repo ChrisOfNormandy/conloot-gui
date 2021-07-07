@@ -1,99 +1,11 @@
 import * as PIXI from 'pixi.js';
 import mouse from './common/Mouse';
 
+import * as colorize from './helpers/colorize';
+
 const loader = PIXI.Loader.shared,
     Graphics = PIXI.Graphics
 
-function decToHex(c) {
-    var hex = Number(c).toString(16);
-    return hex.length === 1 ? `0${hex}` : hex;
-}
-
-
-function rgbToHex(r, g, b) {
-    return Number(`0x${decToHex(r)}${decToHex(g)}${decToHex(b)}`);
-}
-
-// function rgbToHsv(r, g, b) {
-//     r /= 255; g /= 255; b /= 255;
-
-//     let v = Math.max(r, g, b), c = v - Math.min(r, g, b);
-//     let h = c && ((v == r) ? (g - b) / c : ((v == g) ? 2 + (b - r) / c : 4 + (r - g) / c));
-
-//     return {
-//         h: 60 * (h < 0 ? h + 6 : h),
-//         s: v && c / v,
-//         v
-//     };
-// }
-
-// function hsvToRgb(h, s, v) {
-//     let r, g, b;
-//     let i = Math.floor(h * 6);
-//     let f = h * 6 - i;
-//     let p = v * (1 - s);
-//     let q = v * (1 - f * s);
-//     let t = v * (1 - (1 - f) * s);
-
-//     switch (i % 6) {
-//         case 0: {
-//             r = v;
-//             g = t;
-//             b = p;
-//             break;
-//         }
-//         case 1: {
-//             r = q;
-//             g = v;
-//             b = p;
-//             break;
-//         }
-//         case 2: {
-//             r = p;
-//             g = v;
-//             b = t;
-//             break;
-//         }
-//         case 3: {
-//             r = p;
-//             g = q;
-//             b = v;
-//             break;
-//         }
-//         case 4: {
-//             r = t;
-//             g = p;
-//             b = v;
-//             break;
-//         }
-//         case 5: {
-//             r = v;
-//             g = p;
-//             b = q;
-//             break;
-//         }
-//     }
-
-//     return [r * 255, g * 255, b * 255];
-// }
-
-function interpolate(v1, v2, a) {
-    return Math.floor((v2 * a) + (v1 * (1 - a)));
-}
-
-function calculatePixelColor(color1, color2) {
-    if (color1.a === 0)
-        return color2;
-    if (color2.a === 0)
-        return color1;
-    
-    return {
-        r: interpolate(color1.r, color2.r, color2.a / 255),
-        g: interpolate(color1.g, color2.g, color2.a / 255),
-        b: interpolate(color1.b, color2.b, color2.a / 255),
-        a: (color1.a + color2.a) > 255 ? 255 : color1.a + color2.a
-    }
-}
 
 const _ = {
     /**
@@ -144,6 +56,12 @@ const _ = {
 
     setBrushSize: (size) => {
         _.brush.size = size;
+    },
+
+    setBrushFill: (color) => {
+        _.brush.fill = color;
+        _.painting.highlight.graphic.tint = colorize.rgbToHex(color.r, color.g, color.b);
+        _.painting.highlight.graphic.alpha = color.a / 255;
     },
 
     updateBounds: () => {
@@ -208,7 +126,8 @@ const _ = {
             `Mouse: ${JSON.stringify(pos)} --> ${x}, ${y}<br />` +
             `Brush:<br />` +
             ` - Color: ${JSON.stringify(_.brush.fill)}<br />` +
-            ` - Hex: 0x${decToHex(_.brush.fill.r)}${decToHex(_.brush.fill.g)}${decToHex(_.brush.fill.b)}<br />` +
+            ` - Pos: ${_.painting.highlight.x}, ${_.painting.highlight.y} --> ${_.painting.highlight.x + _.brush.size - 1}, ${_.painting.highlight.y + _.brush.size - 1}<br />` +
+            ` - Hex: 0x${colorize.decToHex(_.brush.fill.r)}${colorize.decToHex(_.brush.fill.g)}${colorize.decToHex(_.brush.fill.b)}<br />` +
             ` - Style: ${_.brush.style}<br />` +
             `Buffer: ${_.buffer.length}<br />` +
             `Hover: ${JSON.stringify(pixel.color)}<br />` +
@@ -234,11 +153,14 @@ const _ = {
                 _.setPixel(pixel.x, pixel.y, pixel.color);
             });
             _.refresh = false;
+
+            _.app.stage.removeChild(_.painting.highlight.graphic);
+            _.app.stage.addChild(_.painting.highlight.graphic);
             return;
         }
 
         _.buffer.forEach((pixel, i) => {
-            pixel.graphic.tint = rgbToHex(pixel.color.r, pixel.color.g, pixel.color.b);
+            pixel.graphic.tint = colorize.rgbToHex(pixel.color.r, pixel.color.g, pixel.color.b);
             pixel.graphic.alpha = pixel.color.a / 255;
 
             if (pixel.changed) {
@@ -250,28 +172,25 @@ const _ = {
         });
 
         _.painting.mousePos = mouse.getPosition();
-        _.painting.highlight.x = Math.floor(_.painting.mousePos.x / _.scale);
-        _.painting.highlight.y = Math.floor(_.painting.mousePos.y / _.scale);
+        _.painting.highlight.x = Math.floor((_.painting.mousePos.x - (_.brush.size - 1) / 2 * _.scale) / _.scale);
+        _.painting.highlight.y = Math.floor((_.painting.mousePos.y - (_.brush.size - 1) / 2 * _.scale) / _.scale);
 
         _.painting.highlight.graphic.x = _.painting.highlight.x * _.scale;
         _.painting.highlight.graphic.y = _.painting.highlight.y * _.scale;
 
-        _.painting.highlight.focus = _.getPixel(_.painting.highlight.x, _.painting.highlight.y);
+        _.painting.highlight.graphic.width = _.scale * _.brush.size;
+        _.painting.highlight.graphic.height = _.scale * _.brush.size;
 
-        if (mouse.button.state && !_.painting.highlight.focus.changed) {
-            if (
-                _.painting.highlight.x >= 0 &&
-                _.painting.highlight.x < _.resolution &&
-                _.painting.highlight.y >= 0 &&
-                _.painting.highlight.y < _.resolution
-            ) {
-                if (mouse.button.id === 0)
-                    _.updatePixel(_.painting.highlight.x, _.painting.highlight.y, _.getCurrentColor());
-                else if (mouse.button.id === 2)
-                    _.updatePixel(_.painting.highlight.x, _.painting.highlight.y, { r: 0, g: 0, b: 0, a: 0 });
-
-                _.painting.highlight.focus.changed = true;
+        if (mouse.button.state) {
+            if (mouse.button.id === 0) {
+                for (let x = _.painting.highlight.x < 0 ? 0 : _.painting.highlight.x; x < _.painting.highlight.x + _.brush.size && x < _.resolution; x++) {
+                    for (let y = _.painting.highlight.y < 0 ? 0 : _.painting.highlight.y; y < _.painting.highlight.y + _.brush.size && y < _.resolution; y++) {
+                        _.updatePixel(x, y, _.getCurrentColor());
+                    }
+                }
             }
+            else if (mouse.button.id === 2)
+                _.updatePixel(_.painting.highlight.x, _.painting.highlight.y, { r: 0, g: 0, b: 0, a: 0 });
 
             if (!mouse.inBounds)
                 mouse.button.state = false;
@@ -294,10 +213,11 @@ const _ = {
 
     updatePixel: (x, y, color) => {
         let pixel = _.getPixel(x, y);
-        if (pixel === null)
+        if (pixel === null || pixel.changed)
             return;
 
-        pixel.color = calculatePixelColor(pixel.color, color);
+        pixel.color = colorize.calculatePixelColor(pixel.color, color);
+        pixel.changed = true;
 
         _.buffer.push(pixel);
     },
@@ -325,7 +245,7 @@ const _ = {
         pixel.graphic.drawRect(0, 0, _.scale, _.scale);
         pixel.graphic.endFill();
 
-        pixel.graphic.tint = rgbToHex(color.r, color.g, color.b);
+        pixel.graphic.tint = colorize.rgbToHex(color.r, color.g, color.b);
         pixel.graphic.alpha = color.a / 255;
 
         pixel.graphic.x = x * _.scale;
@@ -391,9 +311,12 @@ const _ = {
         _.pixels = [];
 
         _.painting.highlight.graphic = new Graphics();
-        _.painting.highlight.graphic.lineStyle(2, 0xFF0000, 1);
-        _.painting.highlight.graphic.drawRect(0, 0, _.scale, _.scale);
+        _.painting.highlight.graphic.beginFill(0xFFFFFF);
+        _.painting.highlight.graphic.drawRect(0, 0, _.scale + 3, _.scale + 3);
         _.painting.highlight.graphic.endFill();
+
+        _.painting.highlight.graphic.tint = colorize.rgbToHex(_.brush.fill.r, _.brush.fill.g, _.brush.fill.b);
+        _.painting.highlight.graphic.alpha = _.brush.fill.a / 255;
 
         for (let x = 0; x < _.resolution; x++) {
             for (let y = 0; y < _.resolution; y++) {

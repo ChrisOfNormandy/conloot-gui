@@ -104,9 +104,10 @@ class TextureEditor extends React.Component {
         if (event.target.value > 255)
             event.target.value = 255;
 
-        let m = event.target.name.match(/rgb_([rgba])/)[1];
-        state.editor.brush.fill[m] = event.target.value === '' ? 0 : Number(event.target.value);
-        state.editor.getCurrentColor();
+        let color = state.editor.getCurrentColor();
+        color[event.target.name.match(/rgb_([rgba])/)[1]] = event.target.value === '' ? 0 : Number(event.target.value);
+        state.editor.setBrushFill(color);
+        
         this.setState(state);
     }
 

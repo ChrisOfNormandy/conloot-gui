@@ -35,6 +35,27 @@ class SideBar extends React.Component {
                             className='color-picker-preview'
                             id='color_picker_preview'
                         />
+                        <div
+                            className='brush-size-preview'
+                            id='brush_size_preview'
+                        />
+                        <input
+                            className='brush-size-input'
+                            id='brush_size_input'
+                            type='text'
+                            defaultValue={1}
+                            onChange={
+                                (event) => {
+                                    this.fetchBrush().size = Number(event.target.value);
+                                }
+                            }
+                            onKeyPress={
+                                (event) => {
+                                    if (event.key.match(/[0-9]/) === null)
+                                        event.preventDefault();
+                                }
+                            }
+                        />
                     </div>
 
                     <div
