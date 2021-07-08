@@ -52,6 +52,18 @@ const _ = {
     },
 
     setBrush: (brush) => {
+        switch (brush) {
+            case 'eraser': {
+                _.painting.highlight.graphic.tint = 0xFFFFFF;
+                _.painting.highlight.graphic.alpha = 1;
+                break;
+            }
+            default: {
+                _.painting.highlight.graphic.tint = colorize.rgbToHex(_.brush.fill.r, _.brush.fill.g, _.brush.fill.b);
+                _.painting.highlight.graphic.alpha = _.brush.fill.a / 255;
+                break;
+            }
+        }
         _.brush.style = brush;
     },
 
@@ -197,7 +209,7 @@ const _ = {
                         switch (_.brush.style) {
                             case 'paint': {
                                 let color = _.getCurrentColor();
-                                color.a = Math.floor((1 - (distance.manhattan(
+                                color.a = (_.brush.fill.a / 255) * Math.floor((1 - (distance.manhattan(
                                     {
                                         x: _.painting.highlight.x + Math.floor(_.brush.size / 2),
                                         y: _.painting.highlight.y + Math.floor(_.brush.size / 2)
@@ -212,6 +224,10 @@ const _ = {
                                 _.updatePixel(x, y, color, _.painting.old.x !== _.painting.highlight.x || _.painting.old.y !== _.painting.highlight.y);
                                 break;
                             }
+                            case 'eraser': {
+                                _.updatePixel(x, y, null, _.painting.old.x !== _.painting.highlight.x || _.painting.old.y !== _.painting.highlight.y, 0);
+                                break
+                            }
                             default: {
                                 _.updatePixel(x, y, _.getCurrentColor());
                                 break;
@@ -220,8 +236,6 @@ const _ = {
                     }
                 }
             }
-            else if (mouse.button.id === 2)
-                _.updatePixel(_.painting.highlight.x, _.painting.highlight.y, { r: 0, g: 0, b: 0, a: 0 });
 
             if (!mouse.inBounds)
                 mouse.button.state = false;
@@ -242,13 +256,17 @@ const _ = {
         return !_.pixels[y * _.resolution + x] ? null : _.pixels[y * _.resolution + x];
     },
 
-    updatePixel: (x, y, color, ignoreChange = false) => {
+    updatePixel: (x, y, color, ignoreChange = false, alpha = null) => {
         let pixel = _.getPixel(x, y);
         if (pixel === null || (pixel.changed && !ignoreChange))
             return;
 
-        pixel.color = colorize.calculatePixelColor(pixel.color, color);
-        pixel.changed = true;
+        if (alpha === null) {
+            pixel.color = color === null ? {r: 0, g: 0, b: 0, a: 0} : colorize.calculatePixelColor(pixel.color, color);
+            pixel.changed = true;
+        }
+        else
+            pixel.color.a = (pixel.color.a / 255) * alpha;
 
         _.buffer.push(pixel);
     },
