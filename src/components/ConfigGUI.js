@@ -5,7 +5,7 @@ import '../styles/config-gui.css';
 
 import { write, getObj } from '../app/config-builder/helpers/writeConfig';
 
-class ConfigForm extends React.Component {
+export default class ConfigForm extends React.Component {
 
     fields = [];
     checkboxes = ['all', 'block', 'slab', 'stairs', 'wall', 'fence'];
@@ -202,5 +202,3 @@ class ConfigForm extends React.Component {
         this.checkRow = this.checkRow.bind(this);
     }
 }
-
-export { ConfigForm };

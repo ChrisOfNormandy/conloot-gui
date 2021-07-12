@@ -3,9 +3,9 @@ import * as PIXI from 'pixi.js';
 
 import { editor } from '../../app/texture-editor/editor';
 
-import { Ribbon } from './Ribbon';
-import { Brushes } from './Brushes';
-import { SideBar } from './SideBar';
+import Ribbon from './Ribbon';
+import Brushes from './Brushes';
+import SideBar from './SideBar';
 
 import mouse from '../../app/texture-editor/common/Mouse';
 
@@ -13,7 +13,7 @@ import './css/texture-editor.css';
 
 let mouseMove_timeout = null;
 
-class TextureEditor extends React.Component {
+export default class TextureEditor extends React.Component {
     state = {
         app: null,
         canvas: null,
@@ -90,23 +90,22 @@ class TextureEditor extends React.Component {
 
         this.state.canvas.addEventListener('click', () => mouse.clicked = true);
 
-        window.addEventListener('resize', () => {
-            this.state.editor.updateBounds();
-        });
+        window.addEventListener('resize', () => this.state.editor.updateBounds());
     }
 
     fetchBrush() {
         return this.state.editor.brush;
     }
 
-    updateColor(event) {
+    updateColor(clr) {
         let state = this.state;
-        if (event.target.value > 255)
-            event.target.value = 255;
 
-        let color = state.editor.getCurrentColor();
-        color[event.target.name.match(/rgb_([rgba])/)[1]] = event.target.value === '' ? 0 : Number(event.target.value);
-        state.editor.setBrushFill(color);
+        let color = state.editor.brush.getColor();
+
+        for (let k in clr)
+            color[k] = clr[k] === '' ? 0 : Number(clr[k]);
+
+        state.editor.brush.setColor(color);
         
         this.setState(state);
     }
@@ -116,7 +115,9 @@ class TextureEditor extends React.Component {
             <div
                 className='editor-container'
             >
-                <Brushes editor={this.state.editor}/>
+                <Brushes 
+                    brush={this.state.editor.brush}
+                />
 
                 <div
                     className='texture-editor-container'
@@ -155,8 +156,9 @@ class TextureEditor extends React.Component {
                 </div>
 
                 <SideBar
+                    brush={this.state.editor.brush}
                     updateColor={this.updateColor}
-                    fetchBrush={this.fetchBrush}
+                    layers={this.state.editor.layers}
                 />
             </div>
         )
@@ -169,5 +171,3 @@ class TextureEditor extends React.Component {
         this.fetchBrush = this.fetchBrush.bind(this);
     }
 }
-
-export { TextureEditor }

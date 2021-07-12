@@ -1,10 +1,10 @@
 import React from 'react';
 
-import { Menu } from '../Menu';
+import Menu from '../Menu';
 
 import './css/ribbon.css';
 
-class Ribbon extends React.Component {
+export default class Ribbon extends React.Component {
 
     editor;
 
@@ -168,5 +168,3 @@ class Ribbon extends React.Component {
         this.setResolution = this.setResolution.bind(this);
     }
 }
-
-export { Ribbon }

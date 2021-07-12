@@ -67,26 +67,6 @@ a:hover {
   color: aqua;
 }
 
-.container-group {
-  padding: 5px;
-  background-color: #333;
-}
-
-.collapsable-container-group {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.2s ease-out;
-}
-
-.collapsable-container-group-trigger {
-  height: 10px;
-  color: white;
-  background-color: #222;
-  border-bottom: 10px solid #888;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-}
-
 .hidden {
   display: none;
 }

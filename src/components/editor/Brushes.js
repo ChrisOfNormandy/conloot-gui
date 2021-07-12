@@ -6,7 +6,7 @@ import pencil from '../../assets/pencil.svg';
 import paintbrush from '../../assets/paintbrush.svg';
 import eraser from '../../assets/eraser.svg';
 
-class Brushes extends React.Component {
+export default class Brushes extends React.Component {
 
     brushes = [
         {
@@ -23,7 +23,7 @@ class Brushes extends React.Component {
         }
     ]
 
-    editor;
+    brush;
 
     render = () => {
         return (
@@ -38,7 +38,7 @@ class Brushes extends React.Component {
                         id={`${brush.key}_brush`}
                         alt={brush.key}
                         onClick={
-                            () => this.editor.setBrush(brush.key)
+                            () => this.brush.setBrush(brush.key)
                         }
                     />
                 ))}
@@ -49,8 +49,6 @@ class Brushes extends React.Component {
     constructor(props) {
         super(props);
 
-        this.editor = props.editor;
+        this.brush = props.brush;
     }
 }
-
-export { Brushes }

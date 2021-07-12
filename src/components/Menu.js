@@ -16,4 +16,4 @@ function Menu(props) {
     )
 }
 
-export { Menu }
+export default Menu;

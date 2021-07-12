@@ -1,17 +1,31 @@
 import React from "react";
 
 import './css/sidebar.css';
+import './css/debug.css';
 
-class SideBar extends React.Component {
+import ColorSettings from "./side-bar/ColorSettings";
+import LayerSettings from "./side-bar/LayerSettings";
+
+export default class SideBar extends React.Component {
+
+    state = {
+        brush: null,
+        layers: null
+    }
 
     updateColor;
-    fetchBrush;
 
-    previewElem = null;
-
-    updatePreview = () => {
-        let rgba = this.fetchBrush().fill;
-        this.previewElem.style.backgroundColor = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a / 255})`;
+    group = (title, component) => {
+        return (
+            <div>
+                <div
+                    className='side-bar-group-title'
+                >
+                    {title}
+                </div>
+                {component}
+            </div>
+        )
     }
 
     render = () => {
@@ -19,129 +33,42 @@ class SideBar extends React.Component {
             <div
                 className='side-bar-container'
             >
-                <div
-                    className='debug'
-                    id='debug'
-                />
-
-                <div
-                    className='color-picker-container'
+                <ul
+                    className='side-bar-group-list'
                 >
-                    <div
-                        className='container-group'
-                        id='color_picker_preview_container'
-                    >
+                    <li className='side-bar-group'>
+                        {this.group(
+                            'COLORS',
+                            <ColorSettings
+                                updateColor={this.updateColor}
+                                brush={this.state.brush}
+                            />
+                        )}
+                    </li>
+                    <li className='side-bar-group'>
+                        {this.group(
+                            'LAYERS',
+                            <LayerSettings
+                                layers={this.state.layers}
+                            />
+                        )}
+                    </li>
+                    <li className='side-bar-group'>
                         <div
-                            className='color-picker-preview'
-                            id='color_picker_preview'
+                            className='debug'
+                            id='debug'
                         />
-                        <div
-                            className='brush-size-preview'
-                            id='brush_size_preview'
-                        />
-                        <input
-                            className='brush-size-input'
-                            id='brush_size_input'
-                            type='text'
-                            defaultValue={1}
-                            onChange={
-                                (event) => {
-                                    this.fetchBrush().size = Number(event.target.value);
-                                }
-                            }
-                            onKeyPress={
-                                (event) => {
-                                    if (event.key.match(/[0-9]/) === null)
-                                        event.preventDefault();
-                                }
-                            }
-                        />
-                    </div>
-
-                    <div
-                        className='collapsable-container-group container-group'
-                        id='color_picker_controls_container'
-                    >
-                        {['r', 'g', 'b', 'a'].map(v => (
-                            <div
-                                key={`rgb_${v}_div`}
-                                className='rgb-input-container'
-                            >
-                                <label
-                                    htmlFor={`rgb_${v}`}
-                                    className='rgb-input-label'
-                                >
-                                    {v}
-                                </label>
-                                <input
-                                    key={v}
-                                    name={`rgb_${v}`}
-                                    id={`rgb_${v}`}
-                                    type='text'
-                                    className='rgb-input-field'
-                                    placeholder='0'
-                                    onChange={
-                                        (event) => {
-                                            this.updateColor(event);
-                                            this.updatePreview();
-                                        }
-                                    }
-                                    onKeyPress={
-                                        (event) => {
-                                            if (!event.key.match(/[0-9]/))
-                                                event.preventDefault();
-                                        }
-                                    }
-                                    defaultValue={v === 'a' ? 255 : ''}
-                                />
-
-                                <input
-                                    key={`${v}_slider`}
-                                    name={`rgb_${v}_slider`}
-                                    type='range'
-                                    min='0'
-                                    max='255'
-                                    className='rgb-input-slider'
-                                    onChange={
-                                        (event) => {
-                                            document.getElementById(`rgb_${v}`).value = event.target.value;
-                                            this.updateColor(event);
-                                            this.updatePreview();
-                                        }
-                                    }
-                                    defaultValue={v === 'a' ? 255 : 0} />
-                            </div>
-                        ))}
-                    </div>
-                    <div
-                        className='collapsable-container-group-trigger'
-                        id='collapse_color_picker'
-                        onClick={
-                            () => {
-                                let controls = document.getElementById('color_picker_controls_container');
-
-                                controls.style.maxHeight = !controls.style.maxHeight ? controls.scrollHeight + 'px' : null;
-                            }
-                        }
-                    />
-                </div>
+                    </li>
+                </ul>
             </div>
         )
-    }
-
-    componentDidMount() {
-        this.previewElem = document.getElementById('color_picker_preview');
-        this.updatePreview();
     }
 
     constructor(props) {
         super(props);
 
+        this.state.brush = props.brush;
+        this.state.layers = props.layers;
         this.updateColor = props.updateColor;
-        this.fetchBrush = props.fetchBrush;
-
-        this.updatePreview = this.updatePreview.bind(this);
     }
 }
-
-export { SideBar }

@@ -3,9 +3,40 @@ function decToHex(c) {
     return hex.length === 1 ? `0${hex}` : hex;
 }
 
+function hexToDec(c) {
+    return parseInt(c, 16);
+}
 
-function rgbToHex(r, g, b) {
-    return Number(`0x${decToHex(r)}${decToHex(g)}${decToHex(b)}`);
+function rgbToHex(r, g, b, a = null) {
+    return Number(`0x${decToHex(r)}${decToHex(g)}${decToHex(b)}${a !== null ? decToHex(a) : ''}`);
+}
+
+function rgbToHexString(r, g, b, a = null) {
+    return `${decToHex(r)}${decToHex(g)}${decToHex(b)}${a !== null ? decToHex(a) : ''}`;
+}
+
+function hexToRgb(hex) {
+    switch (hex.length) {
+        case 0: return {r: 0, g: 0, b:0, a: 255}
+        case 1: return {r: hexToDec(hex), g: hexToDec(hex), b: hexToDec(hex), a: 255}
+        case 3: {
+            let rgb = hex.split('');
+            return { r: hexToDec(`${rgb[0] + rgb[0]}`), g: hexToDec(`${rgb[1] + rgb[1]}`), b: hexToDec(`${rgb[2] + rgb[2]}`), a: 255 }
+        }
+        case 4: {
+            let rgba = hex.split('');
+            return { r: hexToDec(`${rgba[0] + rgba[0]}`), g: hexToDec(`${rgba[1] + rgba[1]}`), b: hexToDec(`${rgba[2] + rgba[2]}`), a: hexToDec(`${rgba[3] + rgba[3]}`) }
+        }
+        case 6: {
+            let rgb = hex.split('');
+            return { r: hexToDec(`${rgb[0] + rgb[1]}`), g: hexToDec(`${rgb[2] + rgb[3]}`), b: hexToDec(`${rgb[4] + rgb[5]}`) }
+        }
+        case 8: {
+            let rgb = hex.split('');
+            return { r: hexToDec(`${rgb[0] + rgb[1]}`), g: hexToDec(`${rgb[2] + rgb[3]}`), b: hexToDec(`${rgb[4] + rgb[5]}`), a: hexToDec(`${rgb[6] + rgb[7]}`) }
+        }
+        default: return {r: 0, g: 0, b: 0, a: 255}
+    }
 }
 
 function rgbToHsv(r, g, b) {
@@ -19,6 +50,10 @@ function rgbToHsv(r, g, b) {
         s: v && c / v,
         v
     };
+}
+
+function rgbColorToHex(color) {
+    return rgbToHex(color.r, color.g, color.b);
 }
 
 function hsvToRgb(h, s, v) {
@@ -79,7 +114,7 @@ function interpolate(v1, v2, a) {
 function calculatePixelColor(color1, color2) {
     if (color1.a === 0)
         return color2;
-    if (color2.a === 0)
+    if (color2.a === 0 || !color2)
         return color1;
 
     return {
@@ -93,6 +128,10 @@ function calculatePixelColor(color1, color2) {
 export {
     decToHex,
     rgbToHex,
+    rgbToHexString,
+    hexToDec,
+    hexToRgb,
+    rgbColorToHex,
     rgbToHsv,
     hsvToRgb,
     interpolate,
