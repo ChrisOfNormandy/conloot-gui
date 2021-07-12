@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/conloot-gui/static/css/main.4311e987.chunk.css",
-    "main.js": "/conloot-gui/static/js/main.d56c31ec.chunk.js",
-    "main.js.map": "/conloot-gui/static/js/main.d56c31ec.chunk.js.map",
+    "main.js": "/conloot-gui/static/js/main.52346e01.chunk.js",
+    "main.js.map": "/conloot-gui/static/js/main.52346e01.chunk.js.map",
     "runtime-main.js": "/conloot-gui/static/js/runtime-main.40996105.js",
     "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.40996105.js.map",
     "static/js/2.9b49125d.chunk.js": "/conloot-gui/static/js/2.9b49125d.chunk.js",
@@ -22,6 +22,6 @@
     "static/js/runtime-main.40996105.js",
     "static/js/2.9b49125d.chunk.js",
     "static/css/main.4311e987.chunk.css",
-    "static/js/main.d56c31ec.chunk.js"
+    "static/js/main.52346e01.chunk.js"
   ]
 }
