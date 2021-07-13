@@ -6,19 +6,9 @@ import './css/ribbon.css';
 
 export default class Ribbon extends React.Component {
 
-    editor;
-
-    setResolution(event) {
-        event.preventDefault();
-        let res = Number(document.getElementById('resolution_input').value)
-        if (isNaN(res))
-            return;
-
-        if (res % 16 === 0 && res > 0 && res <= 128)
-            this.editor = this.editor.create(this.editor.app, res);
-    }
-
-    content = [
+    state = {
+        editor: null,
+        content: [
         {
             key: "File",
             id: 'file_menu',
@@ -118,11 +108,26 @@ export default class Ribbon extends React.Component {
                 />
             )
         }
-    ];
+    ]
+}
+
+setResolution(event) {
+    event.preventDefault();
+    let res = Number(document.getElementById('resolution_input').value)
+    if (isNaN(res))
+        return;
+
+    let state = this.state;
+
+    if (res % 16 === 0 && res > 0 && res <= 128)
+        state.editor = state.editor.create(this.editor.app, res);
+
+    this.setState(state);
+}
 
     componentDidMount = () => {
         let ribbonContent = [];
-        this.content.forEach(item => ribbonContent.push(document.getElementById(item.id)));
+        this.state.content.forEach(item => ribbonContent.push(document.getElementById(item.id)));
 
         document.addEventListener('click', (event) => {
             ribbonContent.forEach(obj => {
@@ -138,7 +143,7 @@ export default class Ribbon extends React.Component {
             <div
                 className='texture-editor-ribbon'
             >
-                {this.content.map(menu => (
+                {this.state.content.map(menu => (
                     <div
                         key={menu.key}
                         className='ribbon-menu'
@@ -163,7 +168,7 @@ export default class Ribbon extends React.Component {
     constructor(props) {
         super(props);
 
-        this.editor = props.editor;
+        this.state.editor = props.editor;
 
         this.setResolution = this.setResolution.bind(this);
     }
