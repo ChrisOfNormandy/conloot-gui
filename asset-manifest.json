@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/conloot-gui/static/css/main.4311e987.chunk.css",
-    "main.js": "/conloot-gui/static/js/main.764286fd.chunk.js",
-    "main.js.map": "/conloot-gui/static/js/main.764286fd.chunk.js.map",
-    "runtime-main.js": "/conloot-gui/static/js/runtime-main.40996105.js",
-    "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.40996105.js.map",
-    "static/js/2.d175e24b.chunk.js": "/conloot-gui/static/js/2.d175e24b.chunk.js",
-    "static/js/2.d175e24b.chunk.js.map": "/conloot-gui/static/js/2.d175e24b.chunk.js.map",
-    "static/js/3.6990f10f.chunk.js": "/conloot-gui/static/js/3.6990f10f.chunk.js",
-    "static/js/3.6990f10f.chunk.js.map": "/conloot-gui/static/js/3.6990f10f.chunk.js.map",
+    "main.css": "/conloot-gui/static/css/main.e74da1a1.chunk.css",
+    "main.js": "/conloot-gui/static/js/main.90af252c.chunk.js",
+    "main.js.map": "/conloot-gui/static/js/main.90af252c.chunk.js.map",
+    "runtime-main.js": "/conloot-gui/static/js/runtime-main.4be17759.js",
+    "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.4be17759.js.map",
+    "static/js/2.b3319aab.chunk.js": "/conloot-gui/static/js/2.b3319aab.chunk.js",
+    "static/js/2.b3319aab.chunk.js.map": "/conloot-gui/static/js/2.b3319aab.chunk.js.map",
+    "static/js/3.13540566.chunk.js": "/conloot-gui/static/js/3.13540566.chunk.js",
+    "static/js/3.13540566.chunk.js.map": "/conloot-gui/static/js/3.13540566.chunk.js.map",
     "index.html": "/conloot-gui/index.html",
-    "static/css/main.4311e987.chunk.css.map": "/conloot-gui/static/css/main.4311e987.chunk.css.map",
-    "static/js/2.d175e24b.chunk.js.LICENSE.txt": "/conloot-gui/static/js/2.d175e24b.chunk.js.LICENSE.txt",
+    "static/css/main.e74da1a1.chunk.css.map": "/conloot-gui/static/css/main.e74da1a1.chunk.css.map",
+    "static/js/2.b3319aab.chunk.js.LICENSE.txt": "/conloot-gui/static/js/2.b3319aab.chunk.js.LICENSE.txt",
     "static/media/eraser.4da23591.svg": "/conloot-gui/static/media/eraser.4da23591.svg",
     "static/media/eye-open.157d1f69.svg": "/conloot-gui/static/media/eye-open.157d1f69.svg",
     "static/media/minus.e3517047.svg": "/conloot-gui/static/media/minus.e3517047.svg",
@@ -19,9 +19,9 @@
     "static/media/pencil.34dc5e45.svg": "/conloot-gui/static/media/pencil.34dc5e45.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.40996105.js",
-    "static/js/2.d175e24b.chunk.js",
-    "static/css/main.4311e987.chunk.css",
-    "static/js/main.764286fd.chunk.js"
+    "static/js/runtime-main.4be17759.js",
+    "static/js/2.b3319aab.chunk.js",
+    "static/css/main.e74da1a1.chunk.css",
+    "static/js/main.90af252c.chunk.js"
   ]
 }
