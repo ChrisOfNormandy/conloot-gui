@@ -1,5 +1,3 @@
-import './styles/App.css';
-
 // import { ConfigForm } from './components/ConfigGUI';
 import TextureEditor from './components/editor/TextureEditor';
 

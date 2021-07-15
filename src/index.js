@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
+import './styles/themes.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import NavBar from './components/NavBar';

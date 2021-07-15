@@ -9,7 +9,7 @@ import SideBar from './SideBar';
 
 import mouse from '../../app/texture-editor/common/Mouse';
 
-import './css/texture-editor.css';
+import './styles/texture-editor.css';
 
 let mouseMove_timeout = null;
 
@@ -51,7 +51,10 @@ export default class TextureEditor extends React.Component {
         this.getCanvas();
         this.state.editor.updateBounds();
 
-        this.state.canvas.addEventListener('mousemove', (event) => {
+        document.addEventListener('mousemove', (event) => {
+            mouse.position.document.x = event.clientX;
+            mouse.position.document.y = event.clientY;
+
             mouse.position.old = {
                 x: Math.floor(mouse.position.x),
                 y: Math.floor(mouse.position.y)
@@ -115,51 +118,52 @@ export default class TextureEditor extends React.Component {
             <div
                 className='editor-container'
             >
-                <Brushes 
-                    brush={this.state.editor.brush}
+                <Ribbon
+                    editor={this.state.editor}
                 />
-
+                
                 <div
                     className='texture-editor-container'
                     id='texture_editor_container'
                 >
-                    <Ribbon
+                    
+
+                    <Brushes
                         editor={this.state.editor}
+                    />
+
+                    <SideBar
+                        editor={this.state.editor}
+                        updateColor={this.updateColor}
                     />
 
                     <div
                         className='texture-editor-wrapper'
                         id='texture_editor_wrapper'
                     />
-
-                    <div
-                        className='texture-editor-controls'
-                    >
-                        <label
-                            htmlFor='texture-name-input'
-                        >
-                            File name:
-                        </label>
-                        <input
-                            type='text'
-                            name='texture-name-input'
-                            id='image_name'
-                            defaultValue='texture'
-                            onKeyPress={
-                                (event) => {
-                                    if (!event.key.match(/[\w\d.()]/))
-                                        event.preventDefault();
-                                }
-                            }
-                        />
-                    </div>
                 </div>
 
-                <SideBar
-                    brush={this.state.editor.brush}
-                    updateColor={this.updateColor}
-                    layers={this.state.editor.layers}
-                />
+                <div
+                    className='texture-editor-controls'
+                >
+                    <label
+                        htmlFor='texture-name-input'
+                    >
+                        File name:
+                    </label>
+                    <input
+                        type='text'
+                        name='texture-name-input'
+                        id='image_name'
+                        defaultValue='texture'
+                        onKeyPress={
+                            (event) => {
+                                if (!event.key.match(/[\w\d.()]/))
+                                    event.preventDefault();
+                            }
+                        }
+                    />
+                </div>
             </div>
         )
     }

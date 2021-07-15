@@ -4,7 +4,7 @@ import Collapsable from '../../fragments/Collapsable';
 
 import * as colorize from '../../../app/texture-editor/helpers/colorize';
 
-import '../css/side-bar/colors.css';
+import '../styles/side-bar/colors.css';
 
 export default class ColorSettings extends React.Component {
     state = {
@@ -19,6 +19,15 @@ export default class ColorSettings extends React.Component {
     updatePreview = () => {
         let rgba = this.state.brush.getColor();
         this.previewElem.style.backgroundColor = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a / 255})`;
+    }
+
+    updateRgb = () => {
+        let color = this.state.brush.getColor();
+
+        ['r', 'g', 'b', 'a'].forEach(k => {
+            document.getElementById(`rgb_${k}`).value = color[k];
+            document.getElementById(`rgb_${k}_slider`).value = color[k];
+        });
     }
 
     updateHex = () => {
@@ -38,6 +47,12 @@ export default class ColorSettings extends React.Component {
     refresh = () => {
         this.previewElem = document.getElementById('color_picker_preview');
         this.container = document.getElementById('color_picker_controls_container');
+    }
+
+    update = () => {
+        this.updateRgb();
+        this.updatePreview();
+        this.updateHex();
     }
 
     componentDidMount() {
@@ -66,6 +81,7 @@ export default class ColorSettings extends React.Component {
                         <input
                             key={`${v}_slider`}
                             name={`rgb_${v}_slider`}
+                            id={`rgb_${v}_slider`}
                             type='range'
                             min='0'
                             max='255'
@@ -138,7 +154,7 @@ export default class ColorSettings extends React.Component {
     render = () => {
         return (
             <div
-                className='side-bar-group'
+                className='floater-group'
             >
                 <div
                     className='container-group'
@@ -183,6 +199,7 @@ export default class ColorSettings extends React.Component {
         super(props);
 
         this.state.brush = props.brush;
+        this.state.brush.preview = this;
 
         this.updateColor = props.updateColor.bind(this);
         

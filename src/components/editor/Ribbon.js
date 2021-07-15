@@ -2,7 +2,7 @@ import React from 'react';
 
 import Menu from '../Menu';
 
-import './css/ribbon.css';
+import './styles/ribbon.css';
 
 export default class Ribbon extends React.Component {
 
@@ -17,7 +17,7 @@ export default class Ribbon extends React.Component {
                     (<div
                         className='menu-button'
                         onClick={
-                            () => this.editor.compose()
+                            () => this.state.editor.compose()
                         }
                     >
                         Download
@@ -57,7 +57,9 @@ export default class Ribbon extends React.Component {
                             type='checkbox'
                             onChange={
                                 (event) => {
-                                    this.editor.debug = event.target.checked;
+                                    let state = this.state;
+                                    state.editor.debug = event.target.checked;
+                                    this.setState(state);
                                 }
                             }
                         />
@@ -75,7 +77,7 @@ export default class Ribbon extends React.Component {
                     (<div
                         className='menu-button'
                         onClick={
-                            () => this.editor.clear()
+                            () => this.state.editor.clear()
                         }
                     >
                         Clear
@@ -95,8 +97,7 @@ export default class Ribbon extends React.Component {
                             className='menu-button'
                             onClick={
                                 () => {
-                                    this.editor.showGrid = !this.editor.showGrid;
-                                    this.editor.refresh = true;
+                                    this.state.editor.toggleGrid();
                                 }
                             }
                         >
@@ -138,7 +139,6 @@ setResolution(event) {
     }
 
     render = () => {
-
         return (
             <div
                 className='texture-editor-ribbon'

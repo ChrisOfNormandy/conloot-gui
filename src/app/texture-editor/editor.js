@@ -8,7 +8,7 @@ import * as colorize from './helpers/colorize';
 import * as distance from './helpers/distance';
 
 const loader = PIXI.Loader.shared,
-    Graphics = PIXI.Graphics
+    Graphics = PIXI.Graphics;
 
 const _ = {
     /**
@@ -40,6 +40,8 @@ const _ = {
             focus: null,
         },
 
+        preview: null,
+
         getStyle: () => {
             return _.brush.style;
         },
@@ -52,6 +54,13 @@ const _ = {
                 case 'eraser': {
                     _.brush.cursor.graphic.tint = 0xFFFFFF;
                     _.brush.cursor.graphic.alpha = 1;
+                    break;
+                }
+                // eslint-disable-next-line
+                case 'fill': {}
+                // eslint-disable-next-line
+                case 'color-picker': {
+                    _.brush.cursor.graphic.alpha = 0;
                     break;
                 }
                 default: {
@@ -116,6 +125,7 @@ const _ = {
     },
 
     background: [],
+    grid: new PIXI.Container(),
 
     resolution: 0,
 
@@ -181,7 +191,7 @@ const _ = {
     },
     buffer: [],
 
-    showGrid: false,
+    gridFlag: false,
     refresh: false,
 
     doBoundUpdate: true,
@@ -209,6 +219,20 @@ const _ = {
         _.refresh = true;
     },
 
+    showGrid: () => {
+        _.app.stage.removeChild(_.grid);
+        _.app.stage.addChild(_.grid);
+    },
+
+    toggleGrid: () => {
+        _.gridFlag = !_.gridFlag;
+
+        if (_.gridFlag)
+            _.app.stage.addChild(_.grid);
+        else
+            _.app.stage.removeChild(_.grid);
+    },
+
     updateDebug: () => {
         let pos = mouse.getPosition();
         let x = Math.floor(pos.x / _.scale),
@@ -220,6 +244,7 @@ const _ = {
 
         _.debug.element.innerHTML =
             `Mouse: ${JSON.stringify(pos)} --> ${x}, ${y}<br />` +
+            ` - ${JSON.stringify(mouse.position.document)}<br />` +
             `Brush:<br />` +
             ` - Color: ${JSON.stringify(_.brush.fill)}<br />` +
             ` - Pos: ${_.brush.cursor.position.x}, ${_.brush.cursor.position.y} --> ${_.brush.cursor.position.x + _.brush.size - 1}, ${_.brush.cursor.position.y + _.brush.size - 1}<br />` +
@@ -251,7 +276,7 @@ const _ = {
             else
                 color = colorize.calculatePixelColor(col, color);
         });
-        
+
         _.pixels[y * _.resolution + x].color = color || { r: 0, g: 0, b: 0, a: 0 };
         _.pixels[y * _.resolution + x].graphic.tint = colorize.rgbColorToHex(_.pixels[y * _.resolution + x].color);
         _.pixels[y * _.resolution + x].graphic.alpha = _.pixels[y * _.resolution + x].color.a / 255;
@@ -282,6 +307,9 @@ const _ = {
             _.app.stage.removeChild(_.brush.cursor.graphic);
             _.app.stage.addChild(_.brush.cursor.graphic);
 
+            if (_.gridFlag)
+                _.showGrid();
+
             _.refresh = false;
 
             return;
@@ -306,48 +334,116 @@ const _ = {
         let color, ignoreChange, alpha;
 
         if (!!layer) {
-            if (mouse.button.state) {
+            if (mouse.clicked) {
+                switch(_.brush.style) {
+                    case 'fill': {
+                        let position = {
+                            x: _.brush.cursor.position.x,
+                            y: _.brush.cursor.position.y
+                        };
+
+                        let origin = {
+                            color: layer.getPixel(position.x, position.y).color
+                        };
+
+                        color = _.brush.getColor();
+                        ignoreChange = false;
+                        alpha = null;
+
+                        let filled = [];
+
+                        function checkColor(color1, color2, tollerance = 5) {
+                            return (
+                                Math.abs(color1.r - color2.r) <= tollerance &&
+                                Math.abs(color1.g - color2.g) <= tollerance &&
+                                Math.abs(color1.b - color2.b) <= tollerance &&
+                                Math.abs(color1.a - color2.a) <= tollerance
+                            )
+                        }
+
+                        function fill(pos) {
+                            let pixel = layer.getPixel(pos.x, pos.y);
+
+                            if (pixel === null || !checkColor(pixel.color, origin.color) || pos.x < 0 || pos.y >= _.resolution || pos.y < 0 || pos.y >= _.resolution)
+                                return;
+
+                            buf = filled.includes(pos) ? null : layer.updatePixel(pos.x, pos.y, color, ignoreChange, alpha);
+
+                            if (buf !== null) {
+                                _.buffer.push(buf);
+                                filled.push(pos);
+
+                                fill({ x: pos.x - 1, y: pos.y });
+                                fill({ x: pos.x + 1, y: pos.y });
+                                fill({ x: pos.x, y: pos.y - 1 });
+                                fill({ x: pos.x, y: pos.y + 1 });
+                            }
+                        }
+
+                        fill(position);
+                        break;
+                    }
+                    case 'color-picker': {
+                        let color = layer.getPixel(_.brush.cursor.position.x, _.brush.cursor.position.y).color;
+                        _.brush.setColor(color);
+                        _.brush.preview.update();
+                        _.brush.updateCursor(true);
+                        break;
+                    }
+                    default: { break; }
+                }
+            }
+            else if (mouse.button.state) {
                 if (mouse.button.id === 0) {
-                    for (let x = _.brush.cursor.position.x < 0 ? 0 : _.brush.cursor.position.x; x < _.brush.cursor.position.x + _.brush.size && x < _.resolution; x++) {
-                        for (let y = _.brush.cursor.position.y < 0 ? 0 : _.brush.cursor.position.y; y < _.brush.cursor.position.y + _.brush.size && y < _.resolution; y++) {
-                            switch (_.brush.style) {
-                                case 'paint': {
-                                    color = _.brush.getColor();
+                    switch (_.brush.style) {
+                        case 'fill': {}
+                        // eslint-disable-next-line
+                        case 'color-picker': { break; }
+                        default: {
+                            for (let x = _.brush.cursor.position.x < 0 ? 0 : _.brush.cursor.position.x; x < _.brush.cursor.position.x + _.brush.size && x < _.resolution; x++) {
+                                for (let y = _.brush.cursor.position.y < 0 ? 0 : _.brush.cursor.position.y; y < _.brush.cursor.position.y + _.brush.size && y < _.resolution; y++) {
+                                    switch (_.brush.style) {
+                                        case 'paint': {
+                                            color = _.brush.getColor();
 
-                                    color.a = (_.brush.fill.a / 255) * Math.floor((1 - (distance.manhattan(
-                                        {
-                                            x: _.brush.cursor.position.x + Math.floor(_.brush.size / 2),
-                                            y: _.brush.cursor.position.y + Math.floor(_.brush.size / 2)
-                                        },
-                                        {
-                                            x, y
+                                            color.a = (_.brush.fill.a / 255) * Math.floor((1 - (distance.manhattan(
+                                                {
+                                                    x: _.brush.cursor.position.x + Math.floor(_.brush.size / 2),
+                                                    y: _.brush.cursor.position.y + Math.floor(_.brush.size / 2)
+                                                },
+                                                {
+                                                    x, y
+                                                }
+                                            ) / Math.round(_.brush.size / 2))) * 255);
+                                            if (color.a < 0)
+                                                color.a = 0;
+
+                                            ignoreChange = _.brush.cursor.position.old.x !== _.brush.cursor.position.x || _.brush.cursor.position.old.y !== _.brush.cursor.position.y;
+                                            alpha = null;
+                                            break;
                                         }
-                                    ) / Math.round(_.brush.size / 2))) * 255);
-                                    if (color.a < 0)
-                                        color.a = 0;
+                                        case 'eraser': {
+                                            color = null;
+                                            ignoreChange = _.brush.cursor.position.old.x !== _.brush.cursor.position.x || _.brush.cursor.position.old.y !== _.brush.cursor.position.y;
+                                            alpha = 0;
+                                            break
+                                        }
+                                        default: {
+                                            color = _.brush.getColor();
+                                            ignoreChange = false;
+                                            alpha = null;
+                                            break;
+                                        }
+                                    }
 
-                                    ignoreChange = _.brush.cursor.position.old.x !== _.brush.cursor.position.x || _.brush.cursor.position.old.y !== _.brush.cursor.position.y;
-                                    alpha = null;
-                                    break;
-                                }
-                                case 'eraser': {
-                                    color = null;
-                                    ignoreChange = _.brush.cursor.position.old.x !== _.brush.cursor.position.x || _.brush.cursor.position.old.y !== _.brush.cursor.position.y;
-                                    alpha = 0;
-                                    break
-                                }
-                                default: {
-                                    color = _.brush.getColor();
-                                    ignoreChange = false;
-                                    alpha = null;
-                                    break;
+                                    buf = layer.updatePixel(x, y, color, ignoreChange, alpha);
+
+                                    if (buf !== null)
+                                        _.buffer.push(buf);
                                 }
                             }
 
-                            buf = layer.updatePixel(x, y, color, ignoreChange, alpha);
-                            
-                            if (buf !== null)
-                                _.buffer.push(buf);
+                            break;
                         }
                     }
                 }
@@ -442,7 +538,7 @@ const _ = {
 
         _.brush.cursor.graphic = new Graphics();
         _.brush.cursor.graphic.beginFill(0xFFFFFF);
-        _.brush.cursor.graphic.drawRect(-1, -1, _.scale + 3, _.scale + 3);
+        _.brush.cursor.graphic.drawRect(0, 0, _.scale, _.scale);
         _.brush.cursor.graphic.endFill();
 
         _.brush.updateCursor(true, true);
@@ -466,7 +562,21 @@ const _ = {
                 _.app.stage.addChild(_.setPixel(x, y).graphic);
 
                 layer.setPixel(x, y, _.pixels[y * _.resolution + x].color);
+
+                let line = new PIXI.Graphics();
+                line.lineStyle(1, 0x000000, 1);
+                line.moveTo(0, y * _.scale);
+                line.lineTo(_.resolution * _.scale, y * _.scale);
+
+                _.grid.addChild(line);
             }
+
+            let line = new PIXI.Graphics();
+            line.lineStyle(1, 0x000000, 1);
+            line.moveTo(x * _.scale, 0);
+            line.lineTo(x * _.scale, _.resolution * _.scale);
+
+            _.grid.addChild(line);
         }
 
         _.app.stage.addChild(_.brush.cursor.graphic);

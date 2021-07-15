@@ -1,72 +1,77 @@
 .color-picker-preview {
-    width: 75%;
-    height: 0;
+    margin: 0 auto;
     padding-bottom: 75%;
 
-    margin: 0 auto;
+    width: 75%;
+    height: 0;
 }
 
 .rgb-container-wrapper {
-    background-color: #444;
+    background-color: var(--background-light);
+
     padding: 5px;
 }
 
 .rgb-input-container {
     display: flex;
+
     margin: 5px;
 }
 
 .rgb-input-label {
-    color: white;
-    align-self: center;
     margin-right: 5px;
+
+    color: var(--font-light);
+
+    align-self: center;
 }
 
 .rgb-input-field {
     border-radius: 10px;
+
     text-align: center;
+
     width: 32px;
 }
 
 .rgb-input-slider {
+    background: var(--slider-track-background);
+
+    appearance: none;
+    -webkit-appearance: none;
+
     width: 100%;
     height: 8px;
 
     align-self: center;
 
-    -webkit-appearance: none;
-
-    background: #d3d3d3;
-
-    outline: none;
-    opacity: 0.7;
-
-    -webkit-transition: 0.1s;
     transition: opacity 0.1s;
-}
-
-.rgb-input-slider:hover {
-    opacity: 1;
+    -webkit-transition: opacity 0.1s;
 }
 
 .rgb-input-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
+    background-color: var(--slider-bar-background);
+
     appearance: none;
+    -webkit-appearance: none;
+
     width: 12px;
     height: 12px;
-    background-color: #008bb6;
+
     cursor: pointer;
 }
 
 .rgb-input-slider::-moz-range-thumb {
+    background-color: var(--slider-bar-background);
+
     width: 12px;
     height: 12px;
-    background-color: #008bb6;
+
     cursor: pointer;
 }
 
 .rgb-input-slider::-webkit-slider-thumb:hover {
-    background-color: #0080ff;
+    background-color: var(--slider-bar-background-highlight);
 
     width: 14px;
     height: 18px;
@@ -75,7 +80,7 @@
 }
 
 .rgb-input-slider::-moz-range-thumb:hover {
-    background-color: #0080ff;
+    background-color: var(--slider-bar-background-highlight);
 
     width: 14px;
     height: 18px;

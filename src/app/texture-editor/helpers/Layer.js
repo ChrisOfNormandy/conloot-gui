@@ -15,6 +15,12 @@ export default class Layer {
         this.pixels.forEach(pixel => this.setPixel(pixel.x, pixel.y, null));
     }
 
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @returns {{color: { r: number, g: number, b: number, a: number }, x: number, y: number, changed: boolean}}
+     */
     getPixel = (x, y) => {
         if (this.visable)
             return !this.pixels[y * this.resolution + x]
@@ -30,6 +36,15 @@ export default class Layer {
         this.editor.refresh = true;
     }
 
+    /**
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {{r: number, g: number, b: number, a: number}} color
+     * @param {boolean} ignoreChange
+     * @param {number} alpha
+     * @returns {{color: { r: number, g: number, b: number, a: number }, x: number, y: number, changed: boolean}}
+     */
     updatePixel = (x, y, color, ignoreChange = false, alpha = null) => {
         let pixel = this.getPixel(x, y);
 
@@ -46,6 +61,13 @@ export default class Layer {
         return pixel;
     }
 
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @param {{r: number, g: number, b: number, a: number}} color 
+     * @returns {{color: { r: number, g: number, b: number, a: number }, x: number, y: number, changed: boolean}}
+     */
     setPixel = (x, y, color = null) => {
         this.pixels[y * this.resolution + x] = {
             color: color === null ? { r: 0, g: 0, b: 0, a: 0 } : color,

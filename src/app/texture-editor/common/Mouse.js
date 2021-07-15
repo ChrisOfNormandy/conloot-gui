@@ -2,7 +2,10 @@ const mouse = {
     position: {
         x: 0,
         y: 0,
-        old: { x: 0, y: 0 }
+        old: { x: 0, y: 0 },
+        document: {
+            x: 0, y: 0
+        }
     },
     button: {
         state: false,
@@ -33,4 +36,4 @@ const mouse = {
     clicked: false
 };
 
-module.exports = mouse;
+export default mouse;

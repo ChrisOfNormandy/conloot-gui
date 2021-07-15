@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './styles/collapsable.css';
+
 import collapseController from '../../app/common/collapseController';
 
 function GetContent(props) {

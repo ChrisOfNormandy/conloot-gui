@@ -1,9 +1,9 @@
 .config-gui-container {
     margin: 0 50px;
     padding: 20px;
-    border: 1px solid white;
+    border: var(--border-default);
     background-color: rgba(0, 26, 255, 0.1);
-    color: white;
+    color: var(--font-light);
 }
 
 .form-container {

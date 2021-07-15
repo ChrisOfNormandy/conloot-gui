@@ -5,7 +5,7 @@ import Collapsable from '../../fragments/Collapsable';
 import eye_open from '../../../assets/eye-open.svg';
 import minus from '../../../assets/minus.svg';
 
-import '../css/side-bar/layers.css';
+import '../styles/side-bar/layers.css';
 
 export default class LayerSettings extends React.Component {
     state = {
@@ -17,16 +17,10 @@ export default class LayerSettings extends React.Component {
     updateActiveLayer = (layer) => {
         let state = this.state;
 
-        state.layers.active = layer;
+        document.getElementById(`layer_${state.layers.active}`).classList.remove('layer-item-selected');
+        document.getElementById(`layer_${layer}`).classList.add('layer-item-selected');
 
-        let i = state.layers.cache.length - 1;
-        while (i >= 0) {
-            if (i !== layer)
-                document.getElementById(`layer_${i}`).classList.remove('layer-item-selected');
-            else
-                document.getElementById(`layer_${i}`).classList.add('layer-item-selected');
-            i--;
-        }
+        state.layers.active = layer;
 
         this.setState(state);
     }
@@ -78,19 +72,15 @@ export default class LayerSettings extends React.Component {
         )
     }
 
-    refresh = () => {
-        this.container = document.getElementById('layers_controls_container');
-    }
-
     componentDidMount() {
-        this.refresh();
-
-        this.updateActiveLayer(0);
+        this.container = document.getElementById('layers_controls_container');
     }
 
     layerControls = () => {
         return (
-            <div>
+            <div
+                className='layers-container'
+            >
                 {
                     this.state.layers.cache.map((layer, index) => (
                         <div
@@ -99,7 +89,7 @@ export default class LayerSettings extends React.Component {
                             id={`layer_${index}`}
                             onClick={
                                 (event) => {
-                                    if (event.target.childNodes > 0)
+                                    // if (event.target.childNodes > 0)
                                         this.updateActiveLayer(index);
                                 }
                             }
@@ -162,7 +152,7 @@ export default class LayerSettings extends React.Component {
     render = () => {
         return (
             <div
-                className='side-bar-group'
+                className='floater-group'
             >
                 <Collapsable
                     id='layer_container'
