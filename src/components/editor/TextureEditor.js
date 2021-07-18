@@ -16,6 +16,9 @@ let mouseMove_timeout = null;
 export default class TextureEditor extends React.Component {
     state = {
         app: null,
+        /**
+         * @type {HTMLElement}
+         */
         canvas: null,
         doBoundUpdate: true,
         editor
@@ -23,16 +26,14 @@ export default class TextureEditor extends React.Component {
 
     getCanvas = () => {
         let parent = document.getElementById('texture_editor_wrapper');
-
-        let scale = parent.getBoundingClientRect().height < parent.getBoundingClientRect().width
-            ? parent.getBoundingClientRect().height * 0.9
-            : parent.getBoundingClientRect().width * 0.9;
+        let parentBounds = parent.getBoundingClientRect();
 
         let state = this.state;
 
         state.app = new PIXI.Application({
-            width: scale,
-            height: scale
+            width: parentBounds.width,
+            height: parentBounds.height,
+            backgroundAlpha: 1
         });
 
         state.editor = editor.create(state.app, 16);
@@ -49,7 +50,7 @@ export default class TextureEditor extends React.Component {
 
     componentDidMount = () => {
         this.getCanvas();
-        this.state.editor.updateBounds();
+        this.state.editor.bounds.update();
 
         document.addEventListener('mousemove', (event) => {
             mouse.position.document.x = event.clientX;
@@ -60,8 +61,8 @@ export default class TextureEditor extends React.Component {
                 y: Math.floor(mouse.position.y)
             };
 
-            mouse.position.x = Math.floor(event.clientX - this.state.editor.bounds.left);
-            mouse.position.y = Math.floor(event.clientY - this.state.editor.bounds.top);
+            mouse.position.x = Math.floor(event.clientX - this.state.editor.bounds.value.left);
+            mouse.position.y = Math.floor(event.clientY - this.state.editor.bounds.value.top);
 
             mouse.moving = true;
 
@@ -93,7 +94,7 @@ export default class TextureEditor extends React.Component {
 
         this.state.canvas.addEventListener('click', () => mouse.clicked = true);
 
-        window.addEventListener('resize', () => this.state.editor.updateBounds());
+        window.addEventListener('resize', () => this.state.editor.bounds.update());
     }
 
     fetchBrush() {
@@ -126,8 +127,6 @@ export default class TextureEditor extends React.Component {
                     className='texture-editor-container'
                     id='texture_editor_container'
                 >
-                    
-
                     <Brushes
                         editor={this.state.editor}
                     />
@@ -140,6 +139,9 @@ export default class TextureEditor extends React.Component {
                     <div
                         className='texture-editor-wrapper'
                         id='texture_editor_wrapper'
+                        onWheel={
+                            (event) => this.state.editor.zoom(event.deltaY > 0)
+                        }
                     />
                 </div>
 

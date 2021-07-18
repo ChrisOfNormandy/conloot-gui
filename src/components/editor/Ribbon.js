@@ -17,7 +17,7 @@ export default class Ribbon extends React.Component {
                     (<div
                         className='menu-button'
                         onClick={
-                            () => this.state.editor.compose()
+                            () => this.state.editor.image.compose()
                         }
                     >
                         Download
@@ -58,7 +58,7 @@ export default class Ribbon extends React.Component {
                             onChange={
                                 (event) => {
                                     let state = this.state;
-                                    state.editor.debug = event.target.checked;
+                                    state.editor.debug.enabled = event.target.checked;
                                     this.setState(state);
                                 }
                             }
@@ -77,7 +77,7 @@ export default class Ribbon extends React.Component {
                     (<div
                         className='menu-button'
                         onClick={
-                            () => this.state.editor.clear()
+                            () => this.state.editor.image.clear()
                         }
                     >
                         Clear
@@ -97,7 +97,7 @@ export default class Ribbon extends React.Component {
                             className='menu-button'
                             onClick={
                                 () => {
-                                    this.state.editor.toggleGrid();
+                                    this.state.editor.grid.toggle();
                                 }
                             }
                         >
