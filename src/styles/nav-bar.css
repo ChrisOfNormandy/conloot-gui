@@ -1,18 +1,18 @@
 .nav-bar {
-    background-color: var(--background-light);
-    padding: 5px 0;
-    margin: 5px 50px 10px;
+  background-color: var(--background-light);
+  padding: 5px 0;
+  margin: 5px 50px 10px;
 }
 
 .nav-bar-button {
-    background-color: var(--background-dark);
-    display: inline-block;
-    margin: 0 20px;
-    padding: 3px;
+  background-color: var(--background-dark);
+  display: inline-block;
+  margin: 0 20px;
+  padding: 3px;
 }
 
 .nav-bar-button:hover {
-    background-color: var(--background-lighter);
+  background-color: var(--background-lighter);
 
-    transition: background-color 0.1s ease-in-out;
+  transition: background-color 0.1s ease-in-out;
 }

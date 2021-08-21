@@ -8,6 +8,29 @@ import pencil from '../../assets/pencil.svg';
 import paintbrush from '../../assets/paintbrush.svg';
 import eraser from '../../assets/eraser.svg';
 
+const brushes = [
+    {
+        key: 'pencil',
+        icon: pencil
+    },
+    {
+        key: 'paint',
+        icon: paintbrush
+    },
+    {
+        key: 'eraser',
+        icon: eraser
+    },
+    {
+        key: 'fill',
+        icon: pencil
+    },
+    {
+        key: 'color-picker',
+        icon: pencil
+    }
+];
+
 export default class Brushes extends React.Component {
 
     state = {
@@ -15,35 +38,12 @@ export default class Brushes extends React.Component {
         brush: null
     };
 
-    brushes = [
-        {
-            key: 'pencil',
-            icon: pencil
-        },
-        {
-            key: 'paint',
-            icon: paintbrush
-        },
-        {
-            key: 'eraser',
-            icon: eraser
-        },
-        {
-            key: 'fill',
-            icon: pencil
-        },
-        {
-            key: 'color-picker',
-            icon: pencil
-        }
-    ];
-
     content = () => {
         return (
             <div
                 className='brushes-container'
             >
-                {this.brushes.map(brush => (
+                {brushes.map(brush => (
                     <img
                         key={brush.key}
                         src={brush.icon}

@@ -1,17 +1,21 @@
 {
-  "homepage": "https://conmod.syren-dev.tech/conloot-gui",
+  "homepage": "https://conmod.syren-dev.tech/",
   "name": "conloot-gui",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@pixi/math": "^6.1.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
-    "pixi.js": "^6.0.4",
+    "ejs": "^3.1.6",
+    "pixi.js": "^6.1.2",
     "pngjs": "^6.0.0",
+    "postcss-reduce-initial": "^4.0.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
+    "resolve-url-loader": "^4.0.0",
     "web-vitals": "^1.1.2"
   },
   "scripts": {

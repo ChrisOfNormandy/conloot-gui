@@ -1,44 +1,44 @@
 .darkmode {
-    --header-background: #111;
-    --main-background: #181818;
-    --footer-background: #111;
+  --header-background: #111;
+  --main-background: #181818;
+  --footer-background: #111;
 
-    --primary-background: #222;
-    --secondary-background: #1f1f1f;
+  --primary-background: #222;
+  --secondary-background: #1f1f1f;
 
-    --editor-background: #111;
+  --editor-background: #111;
 
-    --background-darkest: #111;
-    --background-darker: #222;
-    --background-dark: #333;
-    --background-light: #444;
-    --background-lighter: #666;
-    --background-lightest: #888;
+  --background-darkest: #111;
+  --background-darker: #222;
+  --background-dark: #333;
+  --background-light: #444;
+  --background-lighter: #666;
+  --background-lightest: #888;
 
-    --background-highlight: #666;
-    --background-highlight-dark: #444;
+  --background-highlight: #666;
+  --background-highlight-dark: #444;
 
-    --border-fill-standard: #777;
-    --border-fill-light: #888;
-    --border-fill-lighter: #999;
-    --border-fill-lightest: #ccc;
+  --border-fill-standard: #777;
+  --border-fill-light: #888;
+  --border-fill-lighter: #999;
+  --border-fill-lightest: #ccc;
 
-    --container-background: #555;
-    --group-background: #666;
+  --container-background: #555;
+  --group-background: #666;
 
-    --background-selected: #777;
-    --border-default: 1px solid var(--border-fill-standard);
-    --border-highlight: 1px solid var(--border-fill-light);
-    --border-selected: 1px solid var(--border-fill-lighter);
-    --border-primary: 5px solid var(--border-fill-lightest);
-    --border-draggable: 10px solid var(--border-fill-lighter);
-    --border-active: 3px solid #0f0;
-    --border-disabled: 1px solid #f00;
+  --background-selected: #777;
+  --border-default: 1px solid var(--border-fill-standard);
+  --border-highlight: 1px solid var(--border-fill-light);
+  --border-selected: 1px solid var(--border-fill-lighter);
+  --border-primary: 5px solid var(--border-fill-lightest);
+  --border-draggable: 10px solid var(--border-fill-lighter);
+  --border-active: 3px solid #0f0;
+  --border-disabled: 1px solid #f00;
 
-    --font-light: #ddd;
-    --font-dark: #222;
+  --font-light: #ddd;
+  --font-dark: #222;
 
-    --slider-track-background: #aaa;
-    --slider-bar-background: #ccc;
-    --slider-bar-background-highlight: #eee;
+  --slider-track-background: #aaa;
+  --slider-bar-background: #ccc;
+  --slider-bar-background-highlight: #eee;
 }

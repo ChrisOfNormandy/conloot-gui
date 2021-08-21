@@ -16,7 +16,7 @@
 
     min-width: 32px;
     min-height: 32px;
-    width: 90%;
+    width: 32px;
 }
 
 .brush-icon:hover:not(.brush-selected) {
