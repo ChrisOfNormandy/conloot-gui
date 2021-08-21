@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/conloot-gui/static/css/main.a18af88a.chunk.css",
-    "main.js": "/conloot-gui/static/js/main.e980c120.chunk.js",
-    "main.js.map": "/conloot-gui/static/js/main.e980c120.chunk.js.map",
-    "runtime-main.js": "/conloot-gui/static/js/runtime-main.40996105.js",
-    "runtime-main.js.map": "/conloot-gui/static/js/runtime-main.40996105.js.map",
-    "static/js/2.29f62822.chunk.js": "/conloot-gui/static/js/2.29f62822.chunk.js",
-    "static/js/2.29f62822.chunk.js.map": "/conloot-gui/static/js/2.29f62822.chunk.js.map",
-    "static/js/3.6990f10f.chunk.js": "/conloot-gui/static/js/3.6990f10f.chunk.js",
-    "static/js/3.6990f10f.chunk.js.map": "/conloot-gui/static/js/3.6990f10f.chunk.js.map",
-    "index.html": "/conloot-gui/index.html",
-    "static/css/main.a18af88a.chunk.css.map": "/conloot-gui/static/css/main.a18af88a.chunk.css.map",
-    "static/js/2.29f62822.chunk.js.LICENSE.txt": "/conloot-gui/static/js/2.29f62822.chunk.js.LICENSE.txt",
-    "static/media/eraser.4da23591.svg": "/conloot-gui/static/media/eraser.4da23591.svg",
-    "static/media/eye-open.157d1f69.svg": "/conloot-gui/static/media/eye-open.157d1f69.svg",
-    "static/media/minus.e3517047.svg": "/conloot-gui/static/media/minus.e3517047.svg",
-    "static/media/paintbrush.f6d07354.svg": "/conloot-gui/static/media/paintbrush.f6d07354.svg",
-    "static/media/pencil.e99a4c16.svg": "/conloot-gui/static/media/pencil.e99a4c16.svg"
+    "main.css": "/static/css/main.da7a9450.chunk.css",
+    "main.js": "/static/js/main.ff6a5615.chunk.js",
+    "main.js.map": "/static/js/main.ff6a5615.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.2a22f97f.js",
+    "runtime-main.js.map": "/static/js/runtime-main.2a22f97f.js.map",
+    "static/js/2.1610daa3.chunk.js": "/static/js/2.1610daa3.chunk.js",
+    "static/js/2.1610daa3.chunk.js.map": "/static/js/2.1610daa3.chunk.js.map",
+    "static/js/3.bbb9b26a.chunk.js": "/static/js/3.bbb9b26a.chunk.js",
+    "static/js/3.bbb9b26a.chunk.js.map": "/static/js/3.bbb9b26a.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/main.da7a9450.chunk.css.map": "/static/css/main.da7a9450.chunk.css.map",
+    "static/js/2.1610daa3.chunk.js.LICENSE.txt": "/static/js/2.1610daa3.chunk.js.LICENSE.txt",
+    "static/media/eraser.4da23591.svg": "/static/media/eraser.4da23591.svg",
+    "static/media/eye-open.157d1f69.svg": "/static/media/eye-open.157d1f69.svg",
+    "static/media/minus.e3517047.svg": "/static/media/minus.e3517047.svg",
+    "static/media/paintbrush.f6d07354.svg": "/static/media/paintbrush.f6d07354.svg",
+    "static/media/pencil.e99a4c16.svg": "/static/media/pencil.e99a4c16.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.40996105.js",
-    "static/js/2.29f62822.chunk.js",
-    "static/css/main.a18af88a.chunk.css",
-    "static/js/main.e980c120.chunk.js"
+    "static/js/runtime-main.2a22f97f.js",
+    "static/js/2.1610daa3.chunk.js",
+    "static/css/main.da7a9450.chunk.css",
+    "static/js/main.ff6a5615.chunk.js"
   ]
 }
