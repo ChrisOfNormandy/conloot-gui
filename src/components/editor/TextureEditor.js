@@ -14,17 +14,7 @@ import './styles/texture-editor.css';
 let mouseMove_timeout = null;
 
 export default class TextureEditor extends React.Component {
-    state = {
-        app: null,
-        /**
-         * @type {HTMLElement}
-         */
-        canvas: null,
-        doBoundUpdate: true,
-        editor
-    }
-
-    getCanvas = () => {
+    getCanvas() {
         let parent = document.getElementById('texture_editor_wrapper');
         let parentBounds = parent.getBoundingClientRect();
 
@@ -48,7 +38,7 @@ export default class TextureEditor extends React.Component {
         this.setState(state);
     }
 
-    componentDidMount = () => {
+    componentDidMount() {
         this.getCanvas();
         this.state.editor.bounds.update();
 
@@ -114,7 +104,7 @@ export default class TextureEditor extends React.Component {
         this.setState(state);
     }
 
-    render = () => {
+    render() {
         return (
             <div
                 className='editor-container'
@@ -172,6 +162,16 @@ export default class TextureEditor extends React.Component {
 
     constructor() {
         super();
+
+        this.state = {
+            app: null,
+                /**
+                 * @type {HTMLElement}
+                 */
+                canvas: null,
+                    doBoundUpdate: true,
+                        editor
+        }
 
         this.updateColor = this.updateColor.bind(this);
         this.fetchBrush = this.fetchBrush.bind(this);

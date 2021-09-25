@@ -7,18 +7,17 @@ import { write, getObj } from '../app/config-builder/helpers/writeConfig';
 
 export default class ConfigForm extends React.Component {
 
-    fields = [];
-    checkboxes = ['all', 'block', 'slab', 'stairs', 'wall', 'fence'];
-
     updateName(event) {
         let arr = this.state.values;
         let i = event.target.name.match(/(\d+)/)[1];
 
         if (!arr[i])
             arr[i] = {};
-        arr[i].name = event.target.value
+        arr[i].name = event.target.value;
 
-        this.setState({ values: arr });
+        let state = this.state;
+        state.values = arr;
+        this.setState(state);
     }
 
     updateMaterial(event) {
@@ -27,9 +26,11 @@ export default class ConfigForm extends React.Component {
 
         if (!arr[i])
             arr[i] = {};
-        arr[i].material = event.target.value
+        arr[i].material = event.target.value;
 
-        this.setState({ values: arr });
+        let state = this.state;
+        state.values = arr;
+        this.setState(state);
     }
 
     addInput() {
@@ -41,7 +42,10 @@ export default class ConfigForm extends React.Component {
 
         let arr = this.state.values;
         arr.push({});
-        this.setState({ values: arr });
+
+        let state = this.state;
+        state.values = arr;
+        this.setState(state);
     }
 
     removeInput() {
@@ -49,7 +53,10 @@ export default class ConfigForm extends React.Component {
 
         let arr = this.state.values;
         arr.splice(-1, 1);
-        this.setState({ values: arr });
+
+        let state = this.state;
+        state.values = arr;
+        this.setState(state);
     }
 
     handleSubmit(event) {
@@ -111,7 +118,9 @@ export default class ConfigForm extends React.Component {
 
         arr[index][box] = event.target.checked;
 
-        this.setState({ values: arr });
+        let state = this.state;
+        state.values = arr;
+        this.setState(state);
     }
 
     render() {
@@ -123,7 +132,7 @@ export default class ConfigForm extends React.Component {
                     <form className='form-body' onSubmit={this.handleSubmit}>
                         <ul className='form-input-list'>
                             {
-                                this.fields.map((field) => (
+                                this.state.fields.map((field) => (
                                     <li className='form-input-list-item' key={field.key}>
                                         <label htmlFor={field.key} >Block {field.key + 1}</label>
                                         <input
@@ -192,7 +201,7 @@ export default class ConfigForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { values: [] };
+        this.state = { values: [], fields: [], checkboxes: ['all', 'block', 'slab', 'stairs', 'wall', 'fence'] };
 
         this.updateName = this.updateName.bind(this);
         this.updateMaterial = this.updateMaterial.bind(this);

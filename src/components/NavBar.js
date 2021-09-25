@@ -1,17 +1,34 @@
 import React from 'react';
 
-import '../styles/nav-bar.css'
+import '../styles/nav-bar.css';
 
 export default class NavBar extends React.Component {
-    render = () => {
+    render() {
         return (
-            <div className='nav-bar'>
-                {/* <div className='nav-bar-button'>Button 1</div>
-                <div className='nav-bar-button'>Button 2</div>
-                <div className='nav-bar-button'>Button 3</div>
-                <div className='nav-bar-button'>Button 4</div>
-                <div className='nav-bar-button'>Button 5</div> */}
-            </div>
+            <ul className='nav-bar'>
+                {this.state.buttons.map((btn, i) => (
+                    <li
+                        className='nav-bar-button'
+                        id={btn.id + '_btn'}
+                        key={i}
+                        onClick={
+                            (e) => {
+                                btn.action(e);
+                            }
+                        }
+                    >
+                        {btn.value}
+                    </li>
+                ))}
+            </ul>
         )
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            buttons: props.buttons || []
+        };
     }
 }
