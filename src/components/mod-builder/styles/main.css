@@ -90,11 +90,26 @@
 
 .file-explorer-list-item {
   color: white;
-  cursor: pointer;
   user-select: none;
 }
 
-.text-area-toolbar {
+.file-explorer-list-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.file-explorer-list-item > span {
+  cursor: pointer;
+}
+
+.file-explorer-row > .file-explorer-options {
+  visibility: hidden;
+}
+
+.file-explorer-row:hover > .file-explorer-options {
+  visibility: visible;
+}
+
+.text-area-toolbar, .file-explorer-toolbar {
   display: flex;
   flex-direction: row;
 
@@ -103,8 +118,20 @@
   justify-content: flex-end;
 
   height: 20px;
+}
 
+.text-area-toolbar > label, .file-explorer-toolbar > label {
+  color: white;
+  margin-right: 5px;
+}
+
+.text-area-toolbar {
   background-color: rgba(0, 0, 0, 0.2);
+}
+
+.file-explorer-toolbar {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding-right: 23px;
 }
 
 .editor-toolbar-icon {
@@ -119,7 +146,30 @@
   color: aqua;
 }
 
-.icon-active {
+.icon-active, .dir-item-icon:hover {
   color: white;
   cursor: pointer;
+}
+
+.file-explorer-options {
+  display: flex;
+  flex-direction: row;
+
+  padding-right: 5px;
+
+  justify-content: space-between;
+}
+
+.dir-item {
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
+}
+
+.file-item {
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
 }

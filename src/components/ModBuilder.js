@@ -1,118 +1,28 @@
 import React from "react";
 import JSZip from 'jszip';
 import FSManager from "../app/common/FileSystem";
-import { FSDir, FSFile } from "../app/common/FileSystem";
+import { FSDir } from "../app/common/FileSystem";
 import Ribbon from './fragments/Ribbon';
 import Menu from './fragments/Menu';
 
 import './mod-builder/styles/main.css';
-import { uniqueId } from "lodash";
 import download from "../app/common/download";
 
-import "bootstrap-icons/font/bootstrap-icons.css";
+import * as filemod from './mod-builder/scripts/filemod';
 
-let currentFile = {
+import "bootstrap-icons/font/bootstrap-icons.css";
+import FileExplorer from "./mod-builder/FileExplorer";
+
+import * as contentBuilder from './mod-builder/scripts/content-builder/content-builder';
+
+const currentFile = {
     file: null,
+    fsfile: null,
     path: '',
     text: ''
 };
 
-/**
- * 
- * @param {FSFile} f 
- * @returns 
- */
-function createFileObj(f) {
-    return (
-        <li
-            id={f.name}
-            className='file-explorer-list-item file-explorer-file-label'
-            title={`${f.name} | Size: ${f.file.size} bytes.`}
-            onClick={
-                () => {
-                    f.file.text()
-                        .then(v => {
-                            const ta = document.getElementById('txtArea');
-
-                            if (ta.value === '' || currentFile.file === null || ta.value === currentFile.text) {
-                                ta.value = v;
-
-                                currentFile.file = f.file;
-                                currentFile.path = f.path;
-                                currentFile.text = v.replace(/\r\n/g, '\n');
-                            }
-                            else
-                                console.log('Unsaved changes.');
-                        })
-                        .catch(err => console.error(err));
-                }
-            }
-        >
-            {f.name}
-        </li>
-    )
-}
-
-/**
- * 
- * @param {FSDir} dir 
- * @returns 
- */
-function createFileList(dir) {
-    if (dir === null)
-        return;
-
-    if (!!dir.content) {
-        let arr = [];
-
-        for (let i in dir.content) {
-            if (!!dir.content[i].content) {
-                let id = uniqueId();
-
-                arr.push(
-                    (
-                        <li
-                            className='file-explorer-list-item'
-                        >
-                            <div
-                                className='file-explorer-dir-label'
-                                onClick={
-                                    () => {
-                                        document.getElementById(id).classList.toggle('hidden');
-                                    }
-                                }
-                            >
-                                {i}
-                            </div>
-                            <div
-                                id={id}
-                                className='file-explorer-dir-group hidden'
-                            >
-                                {createFileList(dir.content[i])}
-                            </div>
-                        </li>
-                    )
-                );
-            }
-            else
-                arr.push(createFileObj(dir.content[i]));
-        }
-
-        return (
-            <ul className='file-explorer-list'>
-                {arr.map(v => v)}
-            </ul>
-        )
-    }
-
-    return (
-        <li
-            className='file-explorer-list-item'
-        >
-            {createFileObj(dir)}
-        </li>
-    );
-}
+const dev = false;
 
 /**
  * 
@@ -122,7 +32,10 @@ function createFileList(dir) {
  */
 function fetchForgeZip(mcVersion, forgeVersion) {
     return new Promise((resolve, reject) => {
-        fetch(`https://maven.minecraftforge.net/net/minecraftforge/forge/${mcVersion}-${forgeVersion}/forge-${mcVersion}-${forgeVersion}-mdk.zip`)
+        fetch(dev
+            ? `http://localhost:8080/download`
+            : `https://maven.minecraftforge.net/net/minecraftforge/forge/${mcVersion}-${forgeVersion}/forge-${mcVersion}-${forgeVersion}-mdk.zip`
+        )
             .then(response => {
                 const zip = new JSZip();
 
@@ -139,14 +52,6 @@ function fetchForgeZip(mcVersion, forgeVersion) {
 }
 
 export default class ModBuilder extends React.Component {
-
-    componentDidMount() {
-        const main = document.getElementById('sect_main');
-        const fileExpl = document.getElementById('sect_file_explorer');
-
-        fileExpl.style.maxHeight = `${main.clientHeight}px`;
-    }
-
     render() {
         return (
             <div className='mod-builder-sect'>
@@ -166,11 +71,29 @@ export default class ModBuilder extends React.Component {
                             id='sect_file_explorer'
                         >
                             <div
-                                className='sect-file-explorer-list'
-                                id='sect_file_explorer_list'
+                                className='file-explorer-toolbar'
                             >
-                                {createFileList(this.state.archive.root)}
+                                <i
+                                    id='editor_new_file_button'
+                                    className="icon bi-file-earmark-plus editor-toolbar-icon icon-active"
+                                    title='New File'
+                                    onClick={
+                                        () => {
+                                            if (this.state.archive.root === null)
+                                                return;
+
+                                            const state = this.state;
+                                            state.archive.root.addFile(
+                                                'new-file.txt',
+                                                new File([], 'new-file.txt')
+                                            );
+                                            this.setState(state);
+                                        }
+                                    }
+                                />
                             </div>
+
+                            <FileExplorer archive={this.state.archive} currentFile={currentFile} />
                         </div>
 
                         <div
@@ -194,6 +117,33 @@ export default class ModBuilder extends React.Component {
                             <div
                                 className='text-area-toolbar'
                             >
+                                <label htmlFor='fileName'>File name:</label>
+                                <input
+                                    type='text'
+                                    name='fileName'
+                                    id='text_area_file_name'
+                                    onKeyPress={
+                                        (e) => {
+                                            if (currentFile.file === null)
+                                                e.preventDefault();
+                                        }
+                                    }
+                                />
+                                <i
+                                    id='editor_rename_button'
+                                    className="icon bi-arrow-return-right editor-toolbar-icon icon-active"
+                                    title='Rename'
+                                    onClick={
+                                        () => {
+                                            if (currentFile.file === null)
+                                                return;
+
+                                            const state = this.state;
+                                            state.archive = rename(state.archive);
+                                            this.setState(state);
+                                        }
+                                    }
+                                />
                                 <i
                                     id='editor_save_button'
                                     className="icon bi-save editor-toolbar-icon"
@@ -209,7 +159,7 @@ export default class ModBuilder extends React.Component {
                                 <i
                                     id='editor_discard_button'
                                     className="icon bi-x-circle editor-toolbar-icon"
-                                    title='Discard changes'
+                                    title='Discard Changes'
                                     onClick={
                                         () => cancelChanges()
                                     }
@@ -227,6 +177,8 @@ export default class ModBuilder extends React.Component {
 
         this.state = {
             archive: new FSManager(),
+            modName: '',
+            orgName: '',
             buttons: [
                 {
                     key: "File",
@@ -246,8 +198,15 @@ export default class ModBuilder extends React.Component {
 
                                                     openForgeZip("1.16.5", "36.2.5", state.archive)
                                                         .then(archive => {
-                                                            state.archive = archive;
-                                                            this.setState(state);
+                                                            filemod.examplemod(archive) 
+                                                                .then(o => {
+                                                                    state.archive = o.archive;
+                                                                    state.modName = o.modName;
+                                                                    state.orgName = o.orgName;
+
+                                                                    this.setState(state);
+                                                                })
+                                                                .catch(err => console.error(err));
                                                         })
                                                         .catch(err => console.error(err));
                                                 }
@@ -326,6 +285,44 @@ export default class ModBuilder extends React.Component {
                             hidden={true}
                         />
                     )
+                },
+                {
+                    key: "Blocks",
+                    id: 'mod_builder_content_blocks_menu',
+                    value: (
+                        <Menu
+                            content={
+                                [
+                                    (
+                                        <div
+
+                                            className='menu-button'
+                                            onClick={
+                                                () => {
+                                                    if (this.state.archive.root === null || this.state.orgName === '' || this.state.modName === '')
+                                                        return console.log('Invalid.');
+
+                                                    let state = this.state;
+
+                                                    let name = prompt('Block name', 'my_block') || 'my_block';
+
+                                                    contentBuilder.default.blocks.standard.create(state.archive.fetch(`src/main/java/com/${state.orgName}/${state.modName.toLowerCase()}/ModBlocks.java`), name)
+                                                        .then(file => {
+                                                            this.setState(state);
+                                                        })
+                                                        .catch(err => console.error(err));
+                                                }
+                                            }
+                                        >
+                                            Create Standard
+                                        </div>
+                                    )
+                                ]
+                            }
+                            id='mod_builder_content_blocks_menu'
+                            hidden={true}
+                        />
+                    )
                 }
             ]
         };
@@ -340,14 +337,32 @@ export default class ModBuilder extends React.Component {
 function save(archive) {
     const txtArea = document.getElementById('txtArea');
 
-    let v = archive.set(currentFile.path, currentFile.file.name, new File([txtArea.value], currentFile.file.name, { type: currentFile.file.type }));
+    let v = archive.set(
+        currentFile.path,
+        currentFile.file.name,
+        new File([txtArea.value], currentFile.file.name, { type: currentFile.file.type })
+    );
 
+    currentFile.fsfile = v;
     currentFile.file = v.file;
-    currentFile.path = v.path;
+    currentFile.path = v.path();
     currentFile.text = txtArea.value;
 
     document.getElementById('editor_save_button').classList.remove('icon-active');
     document.getElementById('editor_discard_button').classList.remove('icon-active');
+
+    return archive;
+}
+
+function rename(archive) {
+    const name = document.getElementById('text_area_file_name').value;
+
+    let newFile = currentFile.fsfile.dir.addFile(name, new File([currentFile.file], name, { type: currentFile.file.type }), currentFile.path);
+
+    currentFile.fsfile.dir.deleteFile(currentFile.file.name);
+
+    currentFile.file = newFile.file;
+    currentFile.fsfile = newFile;
 
     return archive;
 }
@@ -375,10 +390,10 @@ function openZip(zip, archive, blob) {
     return new Promise((resolve, reject) => {
         zip.loadAsync(blob)
             .then(async (zipped) => {
-                let i, d, file, path, fileName;
+                let i, file, path, fileName;
 
                 for (i in zipped.files) {
-                    d = archive.root;
+                    let d = archive.root;
 
                     file = zipped.file(i);
                     path = i.split('/');
@@ -392,7 +407,7 @@ function openZip(zip, archive, blob) {
                                 archive.root = new FSDir(v);
                                 d = archive.root;
                             }
-                            else if (d.exists(v))
+                            else if (d.contains(v))
                                 d = d.getDir(v);
                             else {
                                 d = d.addDir(v);
@@ -417,10 +432,10 @@ function openForgeZip(mcVersion, forgeVersion, archive) {
     return new Promise((resolve, reject) => {
         fetchForgeZip(mcVersion, forgeVersion, archive)
             .then(async (zipped) => {
-                let i, d, file, path, fileName;
+                let i, file, path, fileName;
 
                 for (i in zipped.files) {
-                    d = archive.root;
+                    let d = archive.root;
 
                     file = zipped.file(i);
                     path = i.split('/');
@@ -434,7 +449,7 @@ function openForgeZip(mcVersion, forgeVersion, archive) {
                                 archive.root = new FSDir(v);
                                 d = archive.root;
                             }
-                            else if (d.exists(v))
+                            else if (d.contains(v))
                                 d = d.getDir(v);
                             else {
                                 d = d.addDir(v);
@@ -445,7 +460,7 @@ function openForgeZip(mcVersion, forgeVersion, archive) {
                             fileName,
                             new File([await file.async('blob')], fileName),
                             path.join('/')
-                        );                    
+                        );
                     }
                 }
 

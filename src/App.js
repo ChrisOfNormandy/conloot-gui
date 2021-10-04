@@ -6,7 +6,10 @@ import './styles/sections.css';
 
 function App() {
     return (
-        <div className='App'>
+        <div 
+            className='App'
+            onDrop={(e) => e.preventDefault()}
+        >
             <div id='sect_paint' className='primary-sect hidden'>
                 <TextureEditor />
             </div>
