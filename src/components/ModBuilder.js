@@ -1,18 +1,23 @@
 import React from "react";
 import JSZip from 'jszip';
 import FSManager from "../app/common/FileSystem";
-import { FSDir } from "../app/common/FileSystem";
 import Ribbon from './fragments/Ribbon';
 import Menu from './fragments/Menu';
+import VertRibbon from "./fragments/VertRibbon";
+import ContextMenu from "./fragments/ContextMenu";
+import FileExplorer from "./mod-builder/FileExplorer";
+import config from '../_config/mod-builder.json';
+import PopupManager from "./fragments/popups/PopupManager";
 
-import './mod-builder/styles/main.css';
-import download from "../app/common/download";
-
-import * as filemod from './mod-builder/scripts/filemod';
+import { save, rename, cancelChanges, exportZip, openZip, openForgeZip } from './mod-builder/archiveHandler';
+import { v4 } from 'uuid';
 
 import "bootstrap-icons/font/bootstrap-icons.css";
-import FileExplorer from "./mod-builder/FileExplorer";
+import './mod-builder/styles/main.css';
+import './mod-builder/styles/popups.css';
+import './mod-builder/styles/block-preview.css';
 
+import * as filemod from './mod-builder/scripts/filemod';
 import * as contentBuilder from './mod-builder/scripts/content-builder/content-builder';
 
 const currentFile = {
@@ -22,36 +27,340 @@ const currentFile = {
     text: ''
 };
 
-const dev = false;
+function formatRegName(str) {
+    return str.split('_').map(s => { return !!s[0] ? (s[0].toUpperCase() + s.slice(1, s.length)) : ''; }).join(' ');
+}
 
-/**
- * 
- * @param {string} mcVersion 
- * @param {string} forgeVersion 
- * @returns {Promise<JSZip>}
- */
-function fetchForgeZip(mcVersion, forgeVersion) {
-    return new Promise((resolve, reject) => {
-        fetch(dev
-            ? `http://localhost:8080/download`
-            : `https://maven.minecraftforge.net/net/minecraftforge/forge/${mcVersion}-${forgeVersion}/forge-${mcVersion}-${forgeVersion}-mdk.zip`
+function formatName(str) {
+    return str.toLowerCase().replace(/\s/g, '_');
+}
+
+class BlockPreview extends React.Component {
+    render() {
+        return (
+            <div className='block-preview-container'>
+                <div
+                    className='block-preview'
+                    id='block_preview'
+                >
+                    {this.state.sides.map((side, i) => (<div className={`block-side bS-${i}`} key={i} />))}
+                </div>
+            </div>
         )
-            .then(response => {
-                const zip = new JSZip();
+    }
 
-                response.blob()
-                    .then(mkd => {
-                        zip.loadAsync(mkd)
-                            .then(zipped => resolve(zipped))
-                            .catch(err => reject(err));
-                    })
-                    .catch(err => reject(err));
-            })
-            .catch(err => reject(err));
-    });
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            sides: []
+        };
+
+        for (let i = 0; i < 6; i++) {
+            this.state.sides[i] = { face: i, texture: null };
+        }
+    }
+}
+
+function genPopup(index, uuid, title, body, tabName = null, tabDescription = null) {
+    return {
+        index,
+        tabName,
+        tabDescription,
+        uuid,
+        title,
+        body,
+        enabled: true,
+        minimizeEvent: null,
+        closeEvent: null
+    }
 }
 
 export default class ModBuilder extends React.Component {
+    closeContextMenu() {
+        let state = this.state;
+        state.contextMenu = null;
+        this.setState(state);
+    }
+
+    getContentMenu(id, icon, title, menuItems) {
+        return {
+            key: `mod_builder_content_${id}_menu`,
+            data: (<i
+                className={`vert-ribbon-icon icon bi-${icon}`}
+                title={title}
+                onClick={
+                    (e) => {
+                        let state = this.state;
+
+                        if (this.state.contextMenu !== null) {
+                            return this.closeContextMenu();
+                        }
+
+                        state.contextMenu = (
+                            <ContextMenu
+                                position={{
+                                    x: e.clientX,
+                                    y: e.clientY
+                                }}
+                                menuItems={menuItems}
+                            />
+                        );
+                        this.setState(state);
+                    }
+                }
+            />)
+        };
+    }
+
+    addPopup(uuid, title, body, tabName = null, tabDescription = null) {
+        let state = this.state;
+
+        let popup;
+
+        if (state.builders.has(uuid)) {
+            let p = state.builders.get(uuid).popups;
+            popup = genPopup(p.length, uuid, title, body, tabName, tabDescription);
+
+            p.push(popup);
+
+            this.setState(state);
+            return popup;
+        }
+
+        popup = genPopup(0, uuid, title, body, tabName, tabDescription);
+
+        state.builders.set(uuid, {
+            uuid,
+            enabled: true,
+            popups: [
+                popup
+            ]
+        });
+
+        this.setState(state);
+
+        return popup;
+    }
+
+    blockBuilder(uuid, defaultValue, path) {
+        return (
+            <div className='content-popup-body'>
+                <BlockPreview />
+
+                <form className='content-popup-form'>
+                    <div className='content-popup-form-row'>
+                        <label
+                            className='content-popup-form-label'
+                            htmlFor={`block_name_input_${uuid}`}
+                        >
+                            Block Name
+                        </label>
+
+                        <input
+                            type='text'
+                            id={`block_name_input_${uuid}`}
+                            name={`block_name_input_${uuid}`}
+                            className='content-popup-form-input'
+                            placeholder='Block Name'
+                            defaultValue={formatRegName(defaultValue)}
+                            onChange={
+                                (e) => {
+                                    document.getElementById(`block_registry_input_${uuid}`).value = formatName(e.target.value);
+                                }
+                            }
+                            onKeyPress={
+                                (e) => {
+                                    if (!/[a-zA-Z0-9-\s]/.test(e.key))
+                                        e.preventDefault();
+                                }
+                            }
+                            required
+                        />
+                    </div>
+
+                    <div className='content-popup-form-row'>
+                        <label
+                            className='content-popup-form-label'
+                            htmlFor={`block_registry_input_${uuid}`}
+                        >
+                            Registry Name
+                        </label>
+
+                        <input
+                            type='text'
+                            id={`block_registry_input_${uuid}`}
+                            name={`block_registry_input_${uuid}`}
+                            className='content-popup-form-input'
+                            placeholder='Registry Name'
+                            defaultValue={formatName(defaultValue)}
+                            onChange={
+                                (e) => {
+                                    document.getElementById(`block_name_input_${uuid}`).value = formatRegName(e.target.value);
+                                }
+                            }
+                            onKeyPress={
+                                (e) => {
+                                    if (!/[a-z0-9-_]/.test(e.key))
+                                        e.preventDefault();
+                                }
+                            }
+                            required
+                        />
+                    </div>
+
+                    <div className='content-popup-form-row'>
+                        <button
+                            onClick={
+                                (e) => {
+                                    e.preventDefault();
+
+                                    let state = this.state;
+
+                                    let name = document.getElementById(`block_registry_input_${uuid}`).value;
+
+                                    contentBuilder.default.blocks.standard.create(state.archive.fetch(path), name)
+                                        .then(file => this.setState(state))
+                                        .catch(err => console.error(err));
+                                }
+                            }
+                        >
+                            Write to File
+                        </button>
+
+                        <button
+                            onClick={
+                                (e) => {
+                                    e.preventDefault();
+                                    let popup = this.addPopup(uuid, 'New Block', this.blockProperties(uuid), 'Block Properties');
+                                    popup.minimizeEvent = (g, v) => {
+                                        v.tabName = 'Block Properties';
+                                    }
+                                }
+                            }
+                        >
+                            Edit Properties
+                        </button>
+
+                        <div
+                            className='content-popup-form-button-row'
+                        >
+                            <button
+                                onClick={
+                                    (e) => {
+                                        e.preventDefault();
+                                        let popup = this.addPopup(uuid, 'Resource Pack', this.blockBuilder(uuid, defaultValue, path), 'Resource Pack');
+                                        popup.minimizeEvent = (g, v) => {
+                                            v.tabName = 'Resource Pack'
+                                        }
+                                    }
+                                }
+                            >
+                                Resource Pack
+                            </button>
+
+                            <button
+                                onClick={
+                                    (e) => {
+                                        e.preventDefault();
+                                        let popup = this.addPopup(uuid, 'Data Pack', this.blockBuilder(uuid, defaultValue, path), 'Data Pack');
+                                        popup.minimizeEvent = (g, v) => {
+                                            v.tabName = 'Data Pack'
+                                        }
+                                    }
+                                }
+                            >
+                                Data Pack
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        )
+    }
+
+    blockProperties(uuid) {
+        return (
+            <div className='content-popup-body'>
+                <form className='content-popup-form'>
+                    <div className='content-popup-form-row'>
+                        <label
+                            className='content-popup-form-label'
+                            htmlFor='block_property_input_a'
+                        >
+                            Field A
+                        </label>
+
+                        <input
+                            type='text'
+                            id='block_property_input_a'
+                            name='block_property_input_a'
+                            className='content-popup-form-input'
+                            placeholder='Field A'
+                            defaultValue='abcdef'
+                            onKeyPress={
+                                (e) => {
+                                    if (!/[a-z0-9-_]/.test(e.key))
+                                        e.preventDefault();
+                                }
+                            }
+                            required
+                        />
+                    </div>
+                </form>
+            </div>
+        )
+    }
+
+    contentPopupBuilder(contentMenuLabel, file, defaultValue) {
+        return {
+            action: () => {
+                this.closeContextMenu();
+
+                if (this.state.archive.root === null || this.state.orgName === '' || this.state.modName === '')
+                    return;
+
+                const path = `src/main/java/com/${this.state.orgName}/${this.state.modName.toLowerCase()}/${file}.java`;
+
+                let id = v4();
+
+                let popup = this.addPopup(id, 'New Block', this.blockBuilder(id, defaultValue, path), formatRegName(defaultValue));
+                popup.minimizeEvent = (g, v) => {
+                    let state = this.state;
+                    let input = document.getElementById(`block_name_input_${g.uuid}`);
+                    if (input !== null)
+                        state.builders.get(g.uuid).popups[v.index].tabName = input.value;
+                    this.setState(state);
+                }
+            },
+            markup: contentMenuLabel
+        }
+    }
+
+    componentDidMount() {
+        let state = this.state;
+
+        if (config.dev) {
+            state.archive.setRoot('My_Mod');
+
+            openForgeZip("1.16.5", "36.2.5", state.archive)
+                .then(archive => {
+                    filemod.examplemod(archive, true)
+                        .then(o => {
+                            state.archive = o.archive;
+                            state.modName = o.modName;
+                            state.orgName = o.orgName;
+
+                            this.setState(state);
+                        })
+                        .catch(err => console.error(err));
+                })
+                .catch(err => console.error(err));
+        }
+
+        this.setState(state);
+    }
+
     render() {
         return (
             <div className='mod-builder-sect'>
@@ -97,8 +406,78 @@ export default class ModBuilder extends React.Component {
                         </div>
 
                         <div
+                            className='sect-content-nav-bar'
+                            id='sect_content_nav_bar'
+                        >
+                            <VertRibbon
+                                content={
+                                    [
+                                        this.getContentMenu(
+                                            'blocks',
+                                            'box',
+                                            'Create New Block',
+                                            [
+                                                this.contentPopupBuilder('Standard', 'ModBlocks', 'my_block')
+                                            ]
+                                        ),
+                                        this.getContentMenu(
+                                            'plants',
+                                            'flower2',
+                                            'Create New Plant',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'resource',
+                                            'gem',
+                                            'Create New Resource',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'worldgen',
+                                            'globe2',
+                                            'Create New World Gen Feature',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'items',
+                                            'trophy',
+                                            'Create New Item',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'tool',
+                                            'tools',
+                                            'Create New Tool / Weapon',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'food',
+                                            'cup-straw',
+                                            'Create New Food',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'fluid',
+                                            'droplet',
+                                            'Create New Fluid',
+                                            []
+                                        ),
+                                        this.getContentMenu(
+                                            'entity',
+                                            'egg',
+                                            'Create New Entity',
+                                            []
+                                        )
+                                    ]
+                                }
+                            />
+                        </div>
+
+                        <div
                             className='sect-text-area'
                         >
+                            {<PopupManager map={this.state.builders} />}
+
                             <textarea
                                 id='txtArea'
                                 onChange={
@@ -139,7 +518,7 @@ export default class ModBuilder extends React.Component {
                                                 return;
 
                                             const state = this.state;
-                                            state.archive = rename(state.archive);
+                                            state.archive = rename(state.archive, currentFile);
                                             this.setState(state);
                                         }
                                     }
@@ -151,7 +530,7 @@ export default class ModBuilder extends React.Component {
                                     onClick={
                                         () => {
                                             const state = this.state;
-                                            state.archive = save(state.archive);
+                                            state.archive = save(state.archive, currentFile);
                                             this.setState(state);
                                         }
                                     }
@@ -161,11 +540,13 @@ export default class ModBuilder extends React.Component {
                                     className="icon bi-x-circle editor-toolbar-icon"
                                     title='Discard Changes'
                                     onClick={
-                                        () => cancelChanges()
+                                        () => cancelChanges(currentFile)
                                     }
                                 />
                             </div>
                         </div>
+
+                        {this.state.contextMenu}
                     </div>
                 </div>
             </div>
@@ -179,6 +560,9 @@ export default class ModBuilder extends React.Component {
             archive: new FSManager(),
             modName: '',
             orgName: '',
+            contextMenu: null,
+            popups: [],
+            builders: new Map(),
             buttons: [
                 {
                     key: "File",
@@ -198,7 +582,7 @@ export default class ModBuilder extends React.Component {
 
                                                     openForgeZip("1.16.5", "36.2.5", state.archive)
                                                         .then(archive => {
-                                                            filemod.examplemod(archive) 
+                                                            filemod.examplemod(archive)
                                                                 .then(o => {
                                                                     state.archive = o.archive;
                                                                     state.modName = o.modName;
@@ -260,7 +644,7 @@ export default class ModBuilder extends React.Component {
                                             onClick={
                                                 () => {
                                                     const state = this.state;
-                                                    state.archive = save(state.archive);
+                                                    state.archive = save(state.archive, currentFile);
                                                     this.setState(state);
                                                 }
                                             }
@@ -285,187 +669,10 @@ export default class ModBuilder extends React.Component {
                             hidden={true}
                         />
                     )
-                },
-                {
-                    key: "Blocks",
-                    id: 'mod_builder_content_blocks_menu',
-                    value: (
-                        <Menu
-                            content={
-                                [
-                                    (
-                                        <div
-
-                                            className='menu-button'
-                                            onClick={
-                                                () => {
-                                                    if (this.state.archive.root === null || this.state.orgName === '' || this.state.modName === '')
-                                                        return console.log('Invalid.');
-
-                                                    let state = this.state;
-
-                                                    let name = prompt('Block name', 'my_block') || 'my_block';
-
-                                                    contentBuilder.default.blocks.standard.create(state.archive.fetch(`src/main/java/com/${state.orgName}/${state.modName.toLowerCase()}/ModBlocks.java`), name)
-                                                        .then(file => {
-                                                            this.setState(state);
-                                                        })
-                                                        .catch(err => console.error(err));
-                                                }
-                                            }
-                                        >
-                                            Create Standard
-                                        </div>
-                                    )
-                                ]
-                            }
-                            id='mod_builder_content_blocks_menu'
-                            hidden={true}
-                        />
-                    )
                 }
             ]
         };
+
+        this.closeContextMenu = this.closeContextMenu.bind(this);
     }
-}
-
-/**
- * 
- * @param {FSManager} archive 
- * @returns {FSManager}
- */
-function save(archive) {
-    const txtArea = document.getElementById('txtArea');
-
-    let v = archive.set(
-        currentFile.path,
-        currentFile.file.name,
-        new File([txtArea.value], currentFile.file.name, { type: currentFile.file.type })
-    );
-
-    currentFile.fsfile = v;
-    currentFile.file = v.file;
-    currentFile.path = v.path();
-    currentFile.text = txtArea.value;
-
-    document.getElementById('editor_save_button').classList.remove('icon-active');
-    document.getElementById('editor_discard_button').classList.remove('icon-active');
-
-    return archive;
-}
-
-function rename(archive) {
-    const name = document.getElementById('text_area_file_name').value;
-
-    let newFile = currentFile.fsfile.dir.addFile(name, new File([currentFile.file], name, { type: currentFile.file.type }), currentFile.path);
-
-    currentFile.fsfile.dir.deleteFile(currentFile.file.name);
-
-    currentFile.file = newFile.file;
-    currentFile.fsfile = newFile;
-
-    return archive;
-}
-
-function cancelChanges() {
-    document.getElementById('txtArea').value = currentFile.text;
-
-    document.getElementById('editor_save_button').classList.remove('icon-active');
-    document.getElementById('editor_discard_button').classList.remove('icon-active');
-}
-
-/**
- * 
- * @param {FSManager} archive 
- */
-function exportZip(archive) {
-    archive.compress()
-        .then(zip => {
-            download(archive.root.name + '.zip', zip);
-        })
-        .catch(err => console.error(err));
-}
-
-function openZip(zip, archive, blob) {
-    return new Promise((resolve, reject) => {
-        zip.loadAsync(blob)
-            .then(async (zipped) => {
-                let i, file, path, fileName;
-
-                for (i in zipped.files) {
-                    let d = archive.root;
-
-                    file = zipped.file(i);
-                    path = i.split('/');
-                    fileName = path.pop();
-
-                    // If file === null, the item is a dir.
-
-                    if (fileName !== '') {
-                        path.forEach(v => {
-                            if (d === null) {
-                                archive.root = new FSDir(v);
-                                d = archive.root;
-                            }
-                            else if (d.contains(v))
-                                d = d.getDir(v);
-                            else {
-                                d = d.addDir(v);
-                            }
-                        });
-
-                        d.addFile(
-                            fileName,
-                            new File([await file.async('blob')], fileName),
-                            path.join('/')
-                        );
-                    }
-                }
-
-                resolve(archive);
-            })
-            .catch(err => reject(err));
-    });
-}
-
-function openForgeZip(mcVersion, forgeVersion, archive) {
-    return new Promise((resolve, reject) => {
-        fetchForgeZip(mcVersion, forgeVersion, archive)
-            .then(async (zipped) => {
-                let i, file, path, fileName;
-
-                for (i in zipped.files) {
-                    let d = archive.root;
-
-                    file = zipped.file(i);
-                    path = i.split('/');
-                    fileName = path.pop();
-
-                    // If file === null, the item is a dir.
-
-                    if (fileName !== '') {
-                        path.forEach(v => {
-                            if (d === null) {
-                                archive.root = new FSDir(v);
-                                d = archive.root;
-                            }
-                            else if (d.contains(v))
-                                d = d.getDir(v);
-                            else {
-                                d = d.addDir(v);
-                            }
-                        });
-
-                        d.addFile(
-                            fileName,
-                            new File([await file.async('blob')], fileName),
-                            path.join('/')
-                        );
-                    }
-                }
-
-                resolve(archive);
-            })
-            .catch(err => reject(err));
-    });
 }

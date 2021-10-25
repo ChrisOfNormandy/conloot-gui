@@ -1,0 +1,76 @@
+:root {
+  --block-preview-scale: 64px;
+}
+
+.block-preview-container {
+  display: flex;
+  align-content: center;
+
+  padding: 10px;
+}
+
+.block-preview {
+  position: relative;
+
+  margin: 0 auto;
+
+  background-color: black;
+
+  align-self: center;
+
+  width: calc(var(--block-preview-scale) * 4);
+  height: calc(var(--block-preview-scale) * 4);
+}
+
+.block-side {
+  position: absolute;
+
+  width: var(--block-preview-scale);
+  height: var(--block-preview-scale);
+}
+
+.block-side:hover {
+  background-color: white;
+}
+
+.bS-0 {
+  background-color: red;
+
+  top: 0;
+  left: var(--block-preview-scale);
+}
+
+.bS-1 {
+  background-color: yellow;
+
+  top: var(--block-preview-scale);
+  left: var(--block-preview-scale);
+}
+
+.bS-2 {
+  background-color: greenyellow;
+
+  top: calc(var(--block-preview-scale) * 2);
+  left: var(--block-preview-scale);
+}
+
+.bS-3 {
+  background-color: aqua;
+
+  top: calc(var(--block-preview-scale) * 3);
+  left: var(--block-preview-scale);
+}
+
+.bS-4 {
+  background-color: magenta;
+
+  top: var(--block-preview-scale);
+  left: 0;
+}
+
+.bS-5 {
+  background-color: blue;
+
+  top: var(--block-preview-scale);
+  left: calc(var(--block-preview-scale) * 2);
+}

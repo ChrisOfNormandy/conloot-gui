@@ -29,6 +29,15 @@
   border-right: 1px solid white;
 }
 
+.sect-content-nav-bar {
+  overflow: hidden;
+  
+  width: 50px;
+  height: 100%;
+
+  border-right: 1px solid white;
+}
+
 .sect-file-explorer-list {
   resize: none;
   overflow-y: scroll;

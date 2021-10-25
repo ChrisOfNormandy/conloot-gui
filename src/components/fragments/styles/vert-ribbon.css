@@ -1,0 +1,24 @@
+.vert-ribbon-container {
+  background-color: rgba(0, 0, 0, 0.2);
+  height: 100%;
+}
+
+.vert-ribbon-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.vert-ribbon-list-item {
+  padding: 0 5px;
+  text-align: center;
+}
+
+.vert-ribbon-icon {
+  color: grey;
+  font-size: 36px;
+}
+
+.vert-ribbon-icon:hover {
+  color: white;
+  cursor: pointer;
+}

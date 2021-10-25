@@ -12,14 +12,21 @@ const tabSize = 4;
  * @param {FSManager} archive 
  * @returns {Promise<{archive: FSManager, modName: string, orgName: string}>}
  */
-export function examplemod(archive) {
+export function examplemod(archive, preset = false) {
     let src_main_java_com = archive.fetchDir('src/main/java/com');
 
     if (src_main_java_com === null)
         return Promise.reject(new Error(`Failed to fetch file: 'src/main/java/com'`));
 
-    let orgName = prompt('Organization (or your name)', 'myorg').toLowerCase() || 'myorg';
-    const modName = prompt('Mod name', 'MyMod').replace(/[^a-zA-Z0-9]/g, '') || 'MyMod';
+    let orgName, modName;
+    if (!preset) {
+        orgName = prompt('Organization (or your name)', 'myorg').toLowerCase() || 'myorg';
+        modName = prompt('Mod name', 'MyMod').replace(/[^a-zA-Z0-9]/g, '') || 'MyMod';
+    }
+    else {
+        orgName = "myorg";
+        modName = "MyMod";
+    }
 
     return new Promise((resolve, reject) => {
         let modMain = src_main_java_com
