@@ -1,0 +1,44 @@
+.App {
+    height: 100%;
+}
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    padding: 0 50px;
+    height: 100%;
+}
+
+.texture-editor-container {
+    background-color: var(--editor-background);
+    border: var(--border-primary);
+    border-radius: 20px;
+    height: 100%;
+    text-align: center;
+}
+
+.texture-editor-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.texture-editor-controls {
+    height: fit-content;
+    background-color: var(--secondary-background);
+    padding: 5px 10px;
+    text-align: left;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.texture-editor-controls > label {
+    color: var(--font-light);
+    margin-right: 10px;
+}
+
+#debug_check_label {
+    color: var(--font-light);
+}

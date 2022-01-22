@@ -1,0 +1,9 @@
+.debug {
+    background-color: var(--background-lightest);
+    color: var(--font-dark);
+
+    padding: 5px;
+
+    text-align: left;
+    font-size: 12px;
+}

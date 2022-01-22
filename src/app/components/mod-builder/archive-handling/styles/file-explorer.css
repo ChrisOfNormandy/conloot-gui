@@ -1,0 +1,77 @@
+.filex-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.filex-list-wrapper {
+  user-select: none;
+  padding: 5px 15px;
+}
+
+.filex-ribbon {
+  padding: 5px 7px;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.filex-list {
+  padding-left: 7px;
+  margin: 0;
+
+  list-style: none;
+
+  width: 100%;
+
+  border-left: 1px solid rgba(255, 255, 255, 0);
+}
+
+.filex-container:hover .filex-list {
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.filex-list-item.file:hover {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.filex-list-item.dir:hover {
+  cursor: pointer;
+}
+
+.filex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  padding: 2px 5px;
+}
+
+.filex-list-item {
+  color: white;
+  padding-right: 8px;
+}
+
+.dir-item, .file-item {
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
+}
+
+.filex-options {
+  display: flex;
+  flex-direction: row;
+}
+
+.filex-icon {
+  color: rgb(100, 100, 100);
+}
+
+.filex-icon:hover {
+  cursor: pointer;
+  color: white;
+}
+
+.filex-label {
+  flex: auto;
+}

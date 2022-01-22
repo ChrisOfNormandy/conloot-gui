@@ -1,0 +1,22 @@
+.sect-container {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+}
+
+.sect-main {
+  display: flex;
+  flex-direction: row;
+
+  height: 100%;
+}
+
+.sect-content-nav-bar {
+  overflow: hidden;
+  
+  width: 50px;
+  height: 100%;
+
+  border-right: 1px solid white;
+}

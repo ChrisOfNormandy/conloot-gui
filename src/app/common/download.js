@@ -1,7 +1,7 @@
 /**
- * 
+ *
  * @param {string} name
- * @param {Blob} blob 
+ * @param {Blob} blob
  */
 export default function download(name, blob) {
     const url = window.URL.createObjectURL(blob);

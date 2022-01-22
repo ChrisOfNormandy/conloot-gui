@@ -1,8 +1,0 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <g transform="rotate(-135, 256, 256)">
-        <rect id="svg_1" height="46" width="190" y="120" x="125" fill="#000000"/>
-        <rect transform="rotate(45,171,119)" id="svg_3" height="64.8" width="65" y="87" x="138" fill="#000000"/>
-        <rect id="svg_6" height="51" width="144" y="74" x="170" fill="#000000"/>
-        <rect id="svg_7" height="245" width="190" y="186" x="125" fill="#000000"/>
-    </g>
-</svg>

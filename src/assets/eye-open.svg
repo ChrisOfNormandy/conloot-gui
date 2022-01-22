@@ -1,4 +1,0 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-    <path d="M 256 186 A 170 70 0 1 0 256 326 A 170 70 0 1 0 256 186 Z M 256 206 A 150 50 0 1 1 256 306 A 150 50 0 1 1 256 206 Z" fill="#000" />
-    <ellipse cx="256" cy="256" rx="45" ry="45" fill="#000"/>
-</svg>

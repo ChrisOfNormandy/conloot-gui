@@ -1,0 +1,32 @@
+.brushes-container {
+    background-color: var(--container-background);
+
+    padding: 5px;
+
+    max-width: fit-content;
+    width: 90%;
+}
+
+.brush-icon {
+    background-color: var(--background-light);
+    border: var(--border-default);
+    border-radius: 16px;
+
+    padding: 2px;
+
+    min-width: 32px;
+    min-height: 32px;
+    width: 32px;
+}
+
+.brush-icon:hover:not(.brush-selected) {
+    background-color: var(--background-highlight);
+    border: var(--border-highlight);
+
+    transition: background-color 0.1s ease-in-out;
+}
+
+.brush-selected {
+    background-color: var(--background-selected);
+    border: var(--border-selected);
+}
