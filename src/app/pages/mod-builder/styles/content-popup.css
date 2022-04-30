@@ -1,0 +1,82 @@
+.content-popup-body {
+  display: flex;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.content-popup-body.row {
+  flex-direction: row;
+}
+
+.content-popup-body.column {
+  flex-direction: column;
+}
+
+.content-popup-form {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+
+.content-popup-form-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  padding: 3px 5px;
+}
+
+.content-popup-form-label {
+  margin-right: 10px;
+  width: 100%;
+}
+
+.content-popup-form-input {
+  width: 100%;
+  text-align: center;
+}
+
+.content-popup-form-input[type="text"] {
+  min-width: 100px;
+}
+
+.content-popup-form-input[type="number"] {
+  min-width: 100px;
+}
+
+.content-popup-form-input[type="checkbox"] {
+  text-align: right;
+  width: fit-content;
+}
+
+.content-popup-icon {
+  display: flex;
+  border: 1px solid white;
+  font-size: 16px;
+  align-items: center;
+  border-radius: 8px;
+
+  margin-left: 10px;
+}
+
+.content-popup-icon:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.content-popup-form-button {
+  border: 1px solid grey;
+  background-color: rgb(50, 50, 50);
+  color: white;
+  border-radius: 7px;
+
+  width: 100%;
+
+  margin: 0 3px;
+}
+
+.content-popup-form-button:hover {
+  cursor: pointer;
+  background-color: rgb(100, 100, 100);
+}

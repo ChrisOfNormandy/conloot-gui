@@ -1,0 +1,21 @@
+.dropdown-container {
+  padding: 5px;
+  background-color: var(--primary-background);
+}
+
+.dropdown-list {
+  list-style-type: none;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-item {
+  background-color: var(--secondary-background);
+  padding: 5px;
+}
+
+.dropdown-item:hover {
+  cursor: pointer;
+  background-color: grey;
+}

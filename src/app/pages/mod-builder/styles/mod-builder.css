@@ -1,0 +1,69 @@
+.nav-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.mod-builder {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.mod-builder-text-area-container {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  width: 100%;
+
+  overflow: hidden;
+}
+
+.mod-builder-text-editor {
+  flex: 1;
+  resize: none;
+  overflow: auto;
+
+  white-space: nowrap;
+
+  background-color: inherit;
+
+  color: white;
+}
+
+.mod-builder-text-editor:focus {
+  outline: none;
+}
+
+.text-area-toolbar, .file-explorer-toolbar {
+  display: flex;
+  flex-direction: row;
+
+  padding: 3px;
+
+  justify-content: flex-end;
+
+  height: 20px;
+}
+
+.text-area-toolbar>label, .file-explorer-toolbar>label {
+  color: white;
+  margin-right: 5px;
+}
+
+.text-area-toolbar {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.editor-toolbar-icon {
+  color: rgb(50, 50, 50);
+}
+
+.editor-toolbar-icon.active {
+  color: grey;
+}
+
+.editor-toolbar-icon.active:hover {
+  cursor: pointer;
+  color: white;
+}

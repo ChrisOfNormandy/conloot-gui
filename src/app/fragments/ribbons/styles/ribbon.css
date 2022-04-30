@@ -1,0 +1,81 @@
+.ribbon-container {
+  display: flex;
+  flex-direction: row;
+
+  padding: 5px 10px;
+
+  background-color: var(--secondary-background);
+  color: white;
+  user-select: none;
+}
+
+.ribbon-item {
+  background-color: var(--primary-background);
+  padding: 5px;
+  text-align: center;
+  width: fit-content;
+}
+
+.ribbon-item-text {
+  padding: 5px;
+  background-color: var(--secondary-background);
+}
+
+.ribbon-item-text:hover {
+  cursor: pointer;
+  background-color: grey;
+}
+
+.ribbon-menu-wrapper {
+  position: absolute;
+  background-color: var(--primary-background);
+  text-align: left;
+}
+
+.ribbon-menu-button {
+  background-color: var(--secondary-background);
+  color: var(--font-light);
+  border-radius: 5px;
+
+  padding: 3px 12px;
+}
+
+.ribbon-menu-button:hover {
+  background-color: var(--background-lighter);
+  color: var(--font-light);
+}
+
+.menu {
+  position: absolute;
+
+  background-color: var(--primary-background);
+
+  padding: 5px;
+
+  min-width: 256px;
+
+  text-align: left;
+}
+
+.menu-button {
+  color: var(--font-light);
+  padding: 3px 8px;
+}
+
+.menu-button:nth-child() {
+  margin-top: 10px;
+}
+
+.menu-button:hover {
+  background-color: var(--secondary-background);
+
+  color: var(--font-light);
+}
+
+.menu-break {
+  background-color: var(--highlight);
+
+  height: 4px;
+  margin: 5px 3px;
+  border-radius: 3px;
+}

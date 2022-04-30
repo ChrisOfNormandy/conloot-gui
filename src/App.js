@@ -1,51 +1,78 @@
+/* eslint-disable react/prop-types */
+
 import React from 'react';
+import NavBar from './app/fragments/navigation/NavBar';
+import ModBuilder from './app/pages/mod-builder/ModBuilder';
 
-import ModBuilder from './views/ModBuilder';
-import NavBar from './app/components/navigation/NavBar';
-// import TextureEditor from './views/TextureEditor';
+import './styles/styles';
+import 'react-toastify/dist/ReactToastify.css';
 
-import './styles/sections.css';
-
-/**
- *
- * @param {*} id
- */
-function toggle(id) {
-    let d;
-
-    buttons.forEach((v) => {
-        d = document.getElementById(v.id);
-
-        if (v.id === id)
-            d.classList.remove('hidden');
-        else
-            d.classList.add('hidden');
-    });
-}
+const forgeVersions = [
+    ['1.18.2', '40.1.0', 'Forge 1.18.2']
+];
 
 const buttons = [
+    ...forgeVersions.map((ver) => {
+        return {
+            value: (
+                <div>
+                    <a
+                        href={`https://maven.minecraftforge.net/net/minecraftforge/forge/${ver[0]}-${ver[1]}/forge-${ver[0]}-${ver[1]}-installer.jar`}
+                    >
+                        {ver[2]}
+                    </a>
+                </div>
+            )
+        };
+    })
+];
+
+const socials = [
     {
-        value: (<div>Paint</div>),
-        id: 'sect_paint',
-        action: () => {
-            toggle('sect_paint');
-        }
+        icon: 'discord',
+        text: 'Discord',
+        link: 'https://discord.gg/EW5JsGJfdt',
+        title: 'Join the Discord community!'
     },
     {
-        value: (<div>Builder</div>),
-        id: 'sect_builder',
-        action: () => {
-            toggle('sect_builder');
-        }
+        icon: 'reddit',
+        text: 'Reddit',
+        link: 'https://reddit.com/r/TheSyrenProject/',
+        title: 'Join the subreddit community!',
     },
     {
-        value: (<div>Config</div>),
-        id: 'sect_config',
-        action: () => {
-            toggle('sect_config');
-        }
+        icon: 'github',
+        text: 'GitHub',
+        link: 'https://github.com/ChrisOfNormandy/',
+        title: 'Check out my other projects!'
     }
 ];
+
+function Social({ icon, text, link = null, title = null }) {
+    return (
+        <div
+            className={`socials-container ${icon}`}
+        >
+            <a
+                className='socials-link'
+                target='_blank'
+                rel='noreferrer'
+                title={title}
+                href={link}
+            >
+                <i
+                    className={`icon bi bi-${icon}`}
+                />
+
+                <span
+                    className='socials-text'
+                >
+                    {text}
+                </span>
+            </a>
+        </div>
+    );
+}
 
 function App() {
     return (
@@ -63,30 +90,30 @@ function App() {
                 />
             </header>
 
-            {/* <div id='sect_paint' className='primary-sect'>
-                <TextureEditor />
-            </div> */}
-
             <main
                 id='sect_builder'
                 className='primary-sect'
             >
                 <ModBuilder />
+
+                <div
+                    className='socials-wrapper'
+                >
+                    {
+                        socials.map((social, i) => <Social
+                            key={i}
+                            icon={social.icon}
+                            text={social.text}
+                            link={social.link}
+                            title={social.title}
+                        />)
+                    }
+                </div>
             </main>
 
             <footer>
                 <div>
                     Built by ChrisOfNormandy.
-                </div>
-                <div>
-                    <span>
-                        Join
-                    </span>
-                    <a
-                        href='https://discord.gg/EW5JsGJfdt'
-                    >
-                        Discord
-                    </a>
                 </div>
             </footer>
         </div>

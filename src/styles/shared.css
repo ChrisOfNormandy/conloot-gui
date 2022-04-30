@@ -1,0 +1,77 @@
+:root {
+  --discord-primary: #7289da;
+  --reddit-primary: #ff4500;
+  --github-primary: #4183c4;
+}
+
+.discord {
+  background-color: var(--discord-primary);
+}
+
+.reddit {
+  background-color: var(--reddit-primary);
+}
+
+.github {
+  background-color: var(--github-primary);
+}
+
+.socials-wrapper {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 10px 10px 30px 20px;
+
+  display: flex;
+  flex-direction: row;
+
+  color: white;
+  background-color: black;
+  border-right: 1px solid white;
+  border-top: 1px solid white;
+  border-top-right-radius: 10px;
+}
+
+.socials-container {
+  display: flex;
+  flex-direction: row;
+  width: fit-content;
+
+  font-size: 16px;
+  border-radius: 10px;
+  box-shadow: 1px 2px 2px white;
+
+  transition: border-radius 0.2s ease-in-out;
+}
+
+.socials-container:hover {
+  border-radius: 5px;
+}
+
+.socials-container:not(:first-child) {
+  margin-left: 10px;
+}
+
+.socials-link {
+  padding: 5px 8px;
+  text-shadow: 0 2px 1px black;
+}
+
+.socials-link:hover {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 1px grey;
+}
+
+.socials-text {
+  position: absolute;
+  opacity: 0;
+  padding-left: 5px;
+
+  transition: opacity 0.2s ease-in-out;
+}
+
+.socials-container:hover .socials-text {
+  position: relative;
+  opacity: 1;
+}

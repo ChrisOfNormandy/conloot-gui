@@ -1,277 +1,122 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import PopUp from './PopUp';
+
+import { Popup } from './Popup';
+
+import './styles/popup-manager.css';
 
 export default class PopupManager extends React.Component {
 
-    getEnabledGroups() {
-        return Array.from(this.state.popups.values()).filter((g) => g.enabled).length;
-    }
+    changeTab(name) {
+        let state = this.state;
 
-    collapseGroup(group) {
-        group.popups.forEach((popup) => {
-            popup.minimizeEvent(group, popup);
-            popup.enabled = false;
+        state.openGroup = null;
+
+        this.popupGroups.forEach((group) => {
+            if (state.openGroup === null && group.name === name) {
+                group.open = !group.open;
+
+                if (group.open)
+                    state.openGroup = group.name;
+            }
+            else {
+                group.open = false;
+
+                let flag = false;
+                group.popups.forEach((popup) => {
+                    if (popup.open)
+                        flag = true;
+                });
+                if (!flag)
+                    this.popupGroups.delete(group.name);
+            }
         });
-
-        group.enabled = false;
-    }
-
-    /**
-     * @param {{showGroups: number, show: boolean, popups: Map<string, {uuid: string, enabled: boolean, popups: {uuid: string, enabled: boolean, title: string, body: *, minimizeEvent: function, closeEvent: function}[]}>, pointer: number}}
-     */
-    updateGroups(state) {
-        if (!state.show) {
-            state.popups.forEach((group) => {
-                this.collapseGroup(group);
-            });
-
-            state.show = true;
-            state.showGroups = 0;
-            this.setState(state);
-
-            return;
-        }
-
-        let x = 0;
-
-        let f;
-        state.popups.forEach((group) => {
-            f = false;
-
-            group.popups.forEach((popup) => {
-                if (popup.enabled) {
-                    f = true;
-
-
-                }
-            });
-
-            group.enabled = f;
-
-            if (group.enabled)
-                x++;
-
-            return group;
-        });
-
-        state.show = true;
-        state.showGroups = x;
 
         this.setState(state);
     }
 
-    componentDidUpdate() {
-        if (this.state.showGroups !== this.getEnabledGroups())
-            this.updateGroups(this.state);
-    }
-
     render() {
-        let groups = Array.from(this.state.popups.values());
+        const groups = Array.from(this.popupGroups.values());
+
+        const getPopups = (group) => Array.from(group.popups.values()).filter((v) => v.open);
 
         return (
-            <div className='popup-manager'>
-                <div className={`popup-manager-container ${this.state.showGroups > 0
-                    ? ''
-                    : 'hidden'}`}>
-                    <i
-                        className='icon bi-chevron-left popup-group-chevron'
-                        onClick={
-                            () => {
-                                if (this.state.pointer === 0)
-                                    return;
-
-                                let state = this.state;
-                                let p = state.pointer;
-
-                                state.pointer--;
-
-                                while (state.pointer > -1 && !groups[state.pointer].enabled)
-                                    state.pointer--;
-
-                                if (state.pointer < 0)
-                                    state.pointer = p;
-
-                                this.updateGroups(state);
-                            }
-                        }
-                    />
-
-                    {groups.map((g, gi) =>
-                        gi === this.state.pointer
-                            ? (
+            <div
+                className='popup-manager-container'
+            >
+                <div
+                    className='popup-manager-ribbon'
+                >
+                    <div
+                        className='popup-tabs-container'
+                    >
+                        {
+                            groups.map((group, i) => (
                                 <div
-                                    id={`popup_${g.uuid}`}
-                                    key={g.uuid}
-                                    className='popup-group-container'
+                                    key={i}
+                                    className='popup-tab-wrapper'
                                 >
                                     <div
-                                        className='popup-group-header'
-                                    >
-                                        <div
-                                            className='popup-group-pointer-label'
-                                        >
-                                            {gi + 1}
-                                        </div>
-
-                                        <i
-                                            className='icon bi-collection popup-btn'
-                                            title='Collapse'
-                                            onClick={
-                                                () => {
-                                                    this.collapseGroup(g);
-
-                                                    let state = this.state;
-                                                    if (gi > 0) {
-                                                        state.pointer = gi - 1;
-                                                        while (state.pointer > -1 && !groups[state.pointer].enabled)
-                                                            state.pointer--;
-
-                                                        if (state.pointer === -1) {
-                                                            state.pointer = gi + 1;
-                                                            while (state.pointer < groups.length && !groups[state.pointer].enabled)
-                                                                state.pointer++;
-
-                                                            if (state.pointer === groups.length)
-                                                                state.show = false;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.pointer = gi + 1;
-                                                        while (state.pointer < groups.length && !groups[state.pointer].enabled)
-                                                            state.pointer++;
-
-                                                        if (state.pointer === groups.length)
-                                                            state.show = false;
-                                                    }
-
-                                                    this.updateGroups(this.state);
-                                                }
+                                        className='popup-tab'
+                                        onClick={
+                                            () => {
+                                                this.changeTab(group.name);
                                             }
-                                        />
+                                        }
+                                    >
+                                        {group.name}
                                     </div>
 
                                     <div
-                                        className='popup-group-row'
+                                        className='popup-tab-counter'
                                     >
-                                        {g.popups.map((v, i) => {
-                                            return v.enabled
-                                                ? (
-                                                    <PopUp
-                                                        key={`${g.uuid}_${i}`}
-                                                        title={v.title}
-                                                        body={v.body}
-                                                        closeEvent={
-                                                            () => {
-                                                                let state = this.state;
-
-                                                                if (v.closeEvent !== null)
-                                                                    v.closeEvent(g, v);
-
-                                                                delete state.popups.get(g.uuid).popups[i];
-                                                                this.updateGroups(state);
-                                                            }
-                                                        }
-                                                        minimizeEvent={
-                                                            () => {
-                                                                let state = this.state;
-
-                                                                if (v.minimizeEvent !== null)
-                                                                    v.minimizeEvent(g, v);
-
-                                                                let p = state.popups.get(g.uuid).popups[i];
-
-                                                                p.enabled = false;
-
-                                                                this.updateGroups(state);
-                                                            }
-                                                        }
-                                                    />
-                                                )
-                                                : null;
-                                        })}
+                                        {group.popups.size}
                                     </div>
+
+                                    {
+                                        group.open
+                                            ? (
+                                                <div
+                                                    className='popup-tab-group'
+                                                >
+                                                    <div
+                                                        className='popup-collection'
+                                                    >
+                                                        {
+                                                            getPopups(group).map((popup, i) => (
+                                                                <Popup
+                                                                    key={i}
+                                                                    title={popup.title}
+                                                                    body={popup.body}
+                                                                    onMinimize={popup.onMinimize}
+                                                                    onClose={popup.onClose}
+                                                                />
+                                                            ))
+                                                        }
+                                                    </div>
+                                                </div>
+                                            )
+                                            : null
+                                    }
                                 </div>
-                            )
-                            : null
-                    )}
-                    <i
-                        className='icon bi-chevron-right popup-group-chevron'
-                        onClick={
-                            () => {
-                                if (this.state.pointer === this.state.popups.size - 1)
-                                    return;
-
-                                let state = this.state;
-                                let p = state.pointer;
-
-                                state.pointer++;
-
-                                while (state.pointer < state.popups.size && !groups[state.pointer].enabled)
-                                    state.pointer++;
-
-                                if (state.pointer === state.popups.size)
-                                    state.pointer = p;
-
-                                this.updateGroups(state);
-                            }
+                            ))
                         }
-                    />
-                </div>
+                    </div>
 
-                <div className='popup-manager-ribbon'>
-                    <button
-                        onClick={
-                            () => {
-                                let state = this.state;
-                                state.show = !state.show;
-                                this.updateGroups(state);
-                            }
-                        }
+                    <div
+                        className='popup-manager-ribbon-controls'
                     >
-                        Collapse All
-                    </button>
+                        <i
+                            className='icon bi bi-dash-circle'
+                        />
 
-                    {groups.map((g, gi) => (
-                        <div
-                            id={`popup_tab_${g.uuid}`}
-                            key={g.uuid}
-                        >
-                            {g.popups.map((v, i) => {
-                                if (v.tabName === null)
-                                    console.log(v);
+                        <i
+                            className='icon bi bi-x-circle'
+                        />
+                    </div>
 
-                                return v.enabled
-                                    ? null
-                                    : (
-                                        <div
-                                            key={`${g.uuid}_${i}`}
-                                            id={`popup_tab_${g.uuid}_${i}`}
-                                            className='popup-tab'
-                                            title='Expand'
-                                            onClick={
-                                                () => {
-                                                    let state = this.state;
-                                                    state.popups.get(g.uuid).popups[i].enabled = true;
-                                                    state.pointer = gi;
-                                                    this.updateGroups(state);
-                                                }
-                                            }
-                                        >
-                                            <i className='icon bi-plus' />
-                                            {
-                                                v.tabName !== null
-                                                    ? `${v.tabName}${v.tabDescription === null
-                                                        ? ''
-                                                        : ` ${v.tabDescription}`}`
-                                                    : `Tab ${i}`
-                                            }
-                                        </div>
-                                    );
-                            })}
-                        </div>
-                    ))}
                 </div>
-            </div>
+            </div >
         );
     }
 
@@ -279,14 +124,14 @@ export default class PopupManager extends React.Component {
         super(props);
 
         /**
-         * @type {{showGroups: number, show: boolean, popups: Map<string, {uuid: string, enabled: boolean, popups: {uuid: string, enabled: boolean, title: string, body: *, minimizeEvent: function, closeEvent: function}[]}>, pointer: number}}
+         * @type {Map<string, *>}
          */
+        this.popupGroups = props.map || new Map();
+
         this.state = {
-            showGroups: 0,
-            show: true,
-            // eslint-disable-next-line react/prop-types
-            popups: props.map || new Map(),
-            pointer: 0
+            openGroup: null
         };
+
+        this.changeTab = this.changeTab.bind(this);
     }
 }

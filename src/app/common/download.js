@@ -5,8 +5,14 @@
  */
 export default function download(name, blob) {
     const url = window.URL.createObjectURL(blob);
-    let link = document.getElementById('download_link');
-    link.href = url;
-    link.setAttribute('download', name);
-    link.click();
+
+    const a = document.createElement('a');
+    document.getElementById('root').appendChild(a);
+
+    a.href = url;
+    a.setAttribute('download', name);
+    a.click();
+
+    document.getElementById('root').removeChild(a);
+    URL.revokeObjectURL(url);
 }

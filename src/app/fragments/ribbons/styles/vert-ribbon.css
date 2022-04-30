@@ -1,0 +1,38 @@
+.vert-ribbon-container {
+  padding: 5px;
+}
+
+.vert-ribbon-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 32px;
+  height: 32px;
+}
+
+.vert-ribbon-item:not(:first-child) {
+  margin-top: 10px;
+}
+
+.vert-ribbon-icon {
+  color: grey;
+  font-size: 32px;
+}
+
+.vert-ribbon-icon:hover {
+  color: white;
+  cursor: pointer;
+}
+
+.vert-ribbon-dropdown-wrapper {
+  position: absolute;
+  right: 0;
+
+  padding: 5px;
+
+  color: white;
+}
