@@ -13,6 +13,10 @@ export default class FSDir {
         if (!!this.content[n] && !overwrite) {
             let i = 1;
             let m = n.match(/(.*?)(\.[a-zA-Z0-9]+)/);
+
+            if (m === null)
+                return this.content[0];
+
             while (this.content[n]) {
                 n = m[1] + `(${i})` + m[2];
                 i++;
@@ -30,7 +34,7 @@ export default class FSDir {
      * @returns {FSFile}
      */
     getFile(name) {
-        return (this.content[name] !== undefined && this.content[name].content === undefined)
+        return this.content[name] !== undefined && this.content[name].content === undefined
             ? this.content[name]
             : null;
     }
@@ -74,7 +78,7 @@ export default class FSDir {
      * @returns {FSDir}
      */
     getDir(name) {
-        return (this.content[name] !== undefined && this.content[name].content !== undefined)
+        return this.content[name] !== undefined && this.content[name].content !== undefined
             ? this.content[name]
             : null;
     }
@@ -85,6 +89,10 @@ export default class FSDir {
      */
     deleteDir(name) {
         delete this.content[name];
+    }
+
+    delete() {
+        delete this.dir[this.name];
     }
 
     /**

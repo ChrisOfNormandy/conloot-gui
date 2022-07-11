@@ -8,10 +8,18 @@ import './styles/file-explorer.css';
 
 let dirTracker = {};
 
+/**
+ *
+ * @param {*} event
+ */
 function onDragOver(event) {
     event.preventDefault();
 }
 
+/**
+ *
+ * @param {*} event
+ */
 function onDragLeave(event) {
     event.preventDefault();
 }
@@ -71,11 +79,11 @@ export default class FileExplorer extends React.Component {
                     this.setState(this.state);
                 },
                 markup:
-                    (
-                        <div>
-                            New File
-                        </div>
-                    )
+
+                    <div>
+                        New File
+                    </div>
+
             },
             {
                 action: () => {
@@ -84,11 +92,11 @@ export default class FileExplorer extends React.Component {
                     this.setState(this.state);
                 },
                 markup:
-                    (
-                        <div>
-                            New Folder
-                        </div>
-                    )
+
+                    <div>
+                        New Folder
+                    </div>
+
             }
         ];
     }
@@ -106,11 +114,11 @@ export default class FileExplorer extends React.Component {
                     file.rename(name);
                     this.setState(this.state);
                 },
-                markup: (
+                markup:
                     <div>
                         Rename
                     </div>
-                )
+
             }
         ];
     }
@@ -149,16 +157,17 @@ export default class FileExplorer extends React.Component {
                             () => {
                                 f.file.text()
                                     .then((v) => {
-                                        const ta = document.getElementById('txtArea');
                                         const state = this.state;
 
-                                        if (ta.value === '' || state.currentFile.file === null || ta.value === state.currentFile.text) {
-                                            ta.value = v;
+                                        const code = this.getCodeFromEditor();
+
+                                        if (code === '' || state.currentFile.file === null || code === state.currentFile.text) {
+                                            this.loadCodeToEditor(v);
 
                                             state.currentFile.fsfile = f;
                                             state.currentFile.file = f.file;
                                             state.currentFile.path = f.path();
-                                            state.currentFile.text = v.replace(/\r\n/g, '\n');
+                                            state.currentFile.text = v;
 
                                             document.getElementById('text_area_file_name').value = f.file.name;
 
@@ -175,7 +184,7 @@ export default class FileExplorer extends React.Component {
                             (e) => {
                                 e.preventDefault();
                                 const state = this.state;
-                                state.contextMenu = (
+                                state.contextMenu =
                                     <ContextMenu
                                         position={
                                             {
@@ -185,7 +194,7 @@ export default class FileExplorer extends React.Component {
                                         }
                                         menuItems={this.fileCtxMenu(f)}
                                     />
-                                );
+                                    ;
                                 this.setState(state);
                             }
                         }
@@ -198,7 +207,7 @@ export default class FileExplorer extends React.Component {
                     >
                         <i
                             id={`${f.name}_delete_button`}
-                            className="icon bi bi-file-earmark-x filex-icon"
+                            className='icon bi bi-file-earmark-x filex-icon'
                             title='Delete'
                             onClick={
                                 () => {
@@ -234,104 +243,104 @@ export default class FileExplorer extends React.Component {
                         dirTracker[id] = false;
 
                     arr.push(
-                        (
-                            <li
-                                className='filex-list-item dir'
-                                key={id}
-                                onDragOver={onDragOver}
-                                onDragLeave={onDragLeave}
-                                onDrop={
-                                    (e) => this.dropHandler(e, dir.content[i])
-                                }
+
+                        <li
+                            className='filex-list-item dir'
+                            key={id}
+                            onDragOver={onDragOver}
+                            onDragLeave={onDragLeave}
+                            onDrop={
+                                (e) => this.dropHandler(e, dir.content[i])
+                            }
+                        >
+                            <div
+                                className='filex-row'
                             >
-                                <div
-                                    className='filex-row'
+                                <span
+                                    className='filex-label'
+                                    onClick={
+                                        () => {
+                                            let v = document.getElementById(id);
+                                            v.classList.toggle('hidden');
+                                            dirTracker[id] = v.classList.contains('hidden');
+                                        }
+                                    }
+                                    onContextMenu={
+                                        (e) => {
+                                            e.preventDefault();
+                                            const state = this.state;
+                                            state.contextMenu =
+                                                <ContextMenu
+                                                    position={
+                                                        {
+                                                            x: e.clientX,
+                                                            y: e.clientY
+                                                        }
+                                                    }
+                                                    menuItems={this.folderCtxMenu(dir.content[i])}
+                                                />
+                                                ;
+                                            this.setState(state);
+                                        }
+                                    }
                                 >
-                                    <span
-                                        className='filex-label'
+                                    {i}
+                                </span>
+
+                                <div
+                                    className='filex-options dir'
+                                >
+                                    <i
+                                        id={`${id}_new_file_button`}
+                                        className='icon bi bi-file-earmark-plus filex-icon'
+                                        title='New File'
                                         onClick={
                                             () => {
-                                                let v = document.getElementById(id);
-                                                v.classList.toggle('hidden');
-                                                dirTracker[id] = v.classList.contains('hidden');
-                                            }
-                                        }
-                                        onContextMenu={
-                                            (e) => {
-                                                e.preventDefault();
                                                 const state = this.state;
-                                                state.contextMenu = (
-                                                    <ContextMenu
-                                                        position={
-                                                            {
-                                                                x: e.clientX,
-                                                                y: e.clientY
-                                                            }
-                                                        }
-                                                        menuItems={this.folderCtxMenu(dir.content[i])}
-                                                    />
+                                                dir.content[i].addFile(
+                                                    'new-file.txt',
+                                                    new File([], 'new-file.txt')
                                                 );
                                                 this.setState(state);
                                             }
                                         }
-                                    >
-                                        {i}
-                                    </span>
+                                    />
 
-                                    <div
-                                        className='filex-options dir'
-                                    >
-                                        <i
-                                            id={`${id}_new_file_button`}
-                                            className="icon bi bi-file-earmark-plus filex-icon"
-                                            title='New File'
-                                            onClick={
-                                                () => {
-                                                    const state = this.state;
-                                                    dir.content[i].addFile(
-                                                        'new-file.txt',
-                                                        new File([], 'new-file.txt')
-                                                    );
-                                                    this.setState(state);
-                                                }
+                                    <i
+                                        id={`${id}_new_folder_button`}
+                                        className='icon bi bi-folder-plus filex-icon'
+                                        title='New Folder'
+                                        onClick={
+                                            () => {
+                                                const state = this.state;
+                                                dir.content[i].addDir('new-folder');
+                                                this.setState(state);
                                             }
-                                        />
+                                        }
+                                    />
 
-                                        <i
-                                            id={`${id}_new_folder_button`}
-                                            className="icon bi bi-folder-plus filex-icon"
-                                            title='New Folder'
-                                            onClick={
-                                                () => {
-                                                    const state = this.state;
-                                                    dir.content[i].addDir('new-folder');
-                                                    this.setState(state);
-                                                }
+                                    <i
+                                        id={`${id}_delete_button`}
+                                        className='icon bi bi-folder-x filex-icon'
+                                        title='Delete'
+                                        onClick={
+                                            () => {
+                                                const state = this.state;
+                                                dir.deleteDir(i);
+                                                this.setState(state);
                                             }
-                                        />
-
-                                        <i
-                                            id={`${id}_delete_button`}
-                                            className="icon bi bi-folder-x filex-icon"
-                                            title='Delete'
-                                            onClick={
-                                                () => {
-                                                    const state = this.state;
-                                                    dir.deleteDir(i);
-                                                    this.setState(state);
-                                                }
-                                            }
-                                        />
-                                    </div>
+                                        }
+                                    />
                                 </div>
+                            </div>
 
-                                <div
-                                    id={id}
-                                >
-                                    {this.createFileList(dir.content[i])}
-                                </div>
-                            </li>
-                        )
+                            <div
+                                id={id}
+                            >
+                                {this.createFileList(dir.content[i])}
+                            </div>
+                        </li>
+
                     );
                 }
                 else
@@ -368,7 +377,7 @@ export default class FileExplorer extends React.Component {
                 >
                     <i
                         id='editor_new_file_button'
-                        className="icon bi bi-file-earmark-plus filex-icon"
+                        className='icon bi bi-file-earmark-plus filex-icon'
                         title='New File'
                         onClick={
                             () => {
@@ -414,6 +423,9 @@ export default class FileExplorer extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.loadCodeToEditor = props.loadCodeToEditor;
+        this.getCodeFromEditor = props.getCodeFromEditor;
 
         /**
          * @type {{archive: FSManager, currentFile: {file: File, fsfile: FSFile, path: string, text: string}, contextMenu: ContextMenu}}

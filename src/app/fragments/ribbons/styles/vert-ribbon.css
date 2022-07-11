@@ -1,5 +1,6 @@
 .vert-ribbon-container {
   padding: 5px;
+  overflow: auto;
 }
 
 .vert-ribbon-btn {

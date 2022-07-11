@@ -1,10 +1,23 @@
+const _repl = {
+    org: (orgName) => orgName.toLowerCase(),
+    mod: (_, modName) => modName.toLowerCase()
+};
+
+const replacements = {
+    'yourname': _repl.org,
+    'modid': _repl.mod,
+    'examplemodsareus': _repl.org,
+    'examplemod': _repl.mod
+};
+
 /**
  *
  * @param {FSManager} archive
  * @returns {Promise<FSManager>}
  */
-export function packMcMeta(archive) {
+export function packMcMeta(archive, orgName, modName) {
     const packFile = archive.fetch('src/main/resources/pack.mcmeta');
+
     if (packFile === null)
         return Promise.reject(new Error('Failed to fetch pack.mcmeta file.'));
 
@@ -13,7 +26,11 @@ export function packMcMeta(archive) {
             .then((fileData) => {
                 let content = fileData;
 
-                packFile.file = new File([content], packFile.file.name, { type: packFile.file.type });
+                for (let r in replacements) {
+                    content = content.replace(new RegExp(r, 'g'), replacements[r](orgName, modName));
+                }
+
+                packFile.write(content);
 
                 resolve(archive);
             })

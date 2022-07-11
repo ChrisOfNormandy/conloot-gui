@@ -14,7 +14,7 @@ const forgeVersions = [
 const buttons = [
     ...forgeVersions.map((ver) => {
         return {
-            value: (
+            value:
                 <div>
                     <a
                         href={`https://maven.minecraftforge.net/net/minecraftforge/forge/${ver[0]}-${ver[1]}/forge-${ver[0]}-${ver[1]}-installer.jar`}
@@ -22,7 +22,7 @@ const buttons = [
                         {ver[2]}
                     </a>
                 </div>
-            )
+
         };
     })
 ];
@@ -48,6 +48,11 @@ const socials = [
     }
 ];
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 function Social({ icon, text, link = null, title = null }) {
     return (
         <div
@@ -74,6 +79,10 @@ function Social({ icon, text, link = null, title = null }) {
     );
 }
 
+/**
+ *
+ * @returns
+ */
 function App() {
     return (
         <div

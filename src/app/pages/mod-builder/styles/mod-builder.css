@@ -7,6 +7,8 @@
   display: flex;
   flex-direction: row;
   height: 100%;
+
+  overflow: hidden;
 }
 
 .mod-builder-text-area-container {
@@ -21,14 +23,6 @@
 
 .mod-builder-text-editor {
   flex: 1;
-  resize: none;
-  overflow: auto;
-
-  white-space: nowrap;
-
-  background-color: inherit;
-
-  color: white;
 }
 
 .mod-builder-text-editor:focus {

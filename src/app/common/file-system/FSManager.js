@@ -53,7 +53,7 @@ export default class FSManager {
     /**
      *
      * @param {string} path
-     * @returns {FSFile}
+     * @returns {import('./FSFile').default}
      */
     fetch(path) {
         if (this.root === null)
@@ -133,12 +133,10 @@ export default class FSManager {
         for (let i in p) {
             if (Number(i) === l && d !== null)
                 f = d.addFile(name, file, true);
-            else {
-                if (d.contains(p[i]))
-                    d = d.getDir(p[i]);
-                else
-                    d = d.addDir(p[i]);
-            }
+            else if (d.contains(p[i]))
+                d = d.getDir(p[i]);
+            else
+                d = d.addDir(p[i]);
         }
 
         return f;

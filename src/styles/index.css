@@ -14,35 +14,8 @@ body {
   height: 100%;
 }
 
-code {
+code, textarea {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
-}
-
-header,
-footer {
-  color: var(--font-light);
-  overflow: hidden;
-  padding: 5px;
-}
-
-header {
-  background-color: var(--header-background);
-  border-bottom: var(--border-default);
-}
-
-main {
-  background-color: var(--main-background);
-  border-left: var(--border-default);
-  border-right: var(--border-default);
-
-  flex: auto;
-}
-
-footer {
-  background-color: var(--footer-background);
-  border-top: var(--border-default);
-  text-align: center;
-  font-size: 14px;
 }
 
 a {
@@ -61,5 +34,33 @@ a:hover {
 .App {
   display: flex;
   flex-direction: column;
+  justify-content: space-evenly;
   height: 100%;
+}
+
+header,
+footer {
+  color: var(--font-light);
+  padding: 5px;
+}
+
+header {
+  background-color: var(--header-background);
+  border-bottom: var(--border-default);
+}
+
+main {
+  background-color: var(--main-background);
+  border-left: var(--border-default);
+  border-right: var(--border-default);
+
+  flex: auto;
+  height: 0;
+}
+
+footer {
+  background-color: var(--footer-background);
+  border-top: var(--border-default);
+  text-align: center;
+  font-size: 14px;
 }

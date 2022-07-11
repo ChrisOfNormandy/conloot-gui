@@ -56,6 +56,10 @@ export default class FSFile {
         return this;
     }
 
+    extname() {
+        return '.' + this.name.split('.').slice(-1);
+    }
+
     /**
      *
      * @param {string} name

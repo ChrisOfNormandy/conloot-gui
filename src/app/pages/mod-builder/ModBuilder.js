@@ -1,5 +1,6 @@
 import React from 'react';
 import JSZip from 'jszip';
+import editor from './editor';
 import Builder from './builders/Builder';
 import Ribbon from '../../fragments/ribbons/Ribbon';
 import FSManager from '../../common/file-system/FSManager';
@@ -8,7 +9,7 @@ import PopupManager from '../../fragments/popups/PopupManager';
 import FileExplorer from './components/archive-handling/FileExplorer';
 import BlockPreview from './components/content-builder/block/BlockPreview';
 
-import { save, rename, cancelChanges, exportZip, openZip, openForgeZip } from './components/archive-handling/archive';
+import { save, rename, cancelChanges, exportZip, openZip, openForgeZip, openLibraryZip } from './components/archive-handling/archive';
 
 import * as filemod from './writer/filemod';
 import * as FileWriter from './writer/writers';
@@ -17,14 +18,24 @@ import './styles/mod-builder.css';
 import './styles/block-preview.css';
 import './styles/content-popup.css';
 
+/**
+ *
+ * @param {*} str
+ * @returns
+ */
 function formatRegName(str) {
     return str.split('_').map((s) => {
         return s[0]
-            ? (s[0].toUpperCase() + s.slice(1, s.length))
+            ? s[0].toUpperCase() + s.slice(1, s.length)
             : '';
     }).join(' ');
 }
 
+/**
+ *
+ * @param {*} str
+ * @returns
+ */
 function formatName(str) {
     return str.toLowerCase().replace(/\s/g, '_');
 }
@@ -87,6 +98,12 @@ export default class ModBuilder extends React.Component {
         this.reload();
     }
 
+    /**
+     *
+     * @param {*} groupName
+     * @param {*} defaultValue
+     * @returns
+     */
     blockBuilder(groupName, defaultValue) {
         return (
             <div
@@ -210,6 +227,11 @@ export default class ModBuilder extends React.Component {
         );
     }
 
+    /**
+     *
+     * @param {*} groupName
+     * @returns
+     */
     blockProperties(groupName) {
         console.log(groupName, this.builder.blocks);
 
@@ -227,10 +249,10 @@ export default class ModBuilder extends React.Component {
                 texts.push(key);
         }
 
-        const Section = ({ keys }) => (
+        const Section = ({ keys }) =>
             <form className='content-popup-form'>
                 {
-                    keys.map((key, i) => (
+                    keys.map((key, i) =>
                         <div
                             key={i}
                             className='content-popup-form-row'
@@ -275,24 +297,24 @@ export default class ModBuilder extends React.Component {
 
                             {
                                 properties[key].value !== null
-                                    ? (
-                                        <i
-                                            className='icon bi bi-info content-popup-icon'
-                                            title={properties[key].toString()}
-                                        />
-                                    )
-                                    : (
-                                        <i
-                                            className='icon bi bi-info content-popup-icon'
-                                            title={properties[key].type}
-                                        />
-                                    )
+                                    ?
+                                    <i
+                                        className='icon bi bi-info content-popup-icon'
+                                        title={properties[key].toString()}
+                                    />
+
+                                    :
+                                    <i
+                                        className='icon bi bi-info content-popup-icon'
+                                        title={properties[key].type}
+                                    />
+
                             }
                         </div>
-                    ))
+                    )
                 }
             </form>
-        );
+            ;
 
         return (
             <div className='content-popup-body row'>
@@ -302,30 +324,75 @@ export default class ModBuilder extends React.Component {
         );
     }
 
+    loadProject(gameVersion, forgeVersion, libraryVersion) {
+        return new Promise((resolve, reject) => {
+            openForgeZip(gameVersion, forgeVersion, this.archive)
+                .then((archive) => {
+                    openLibraryZip(gameVersion, libraryVersion, archive)
+                        .then((archive) => {
+                            // const src_main_java_com = archive.fetchDir('src/main/java/com');
+                            // archive.fetchDir('CoNLib-1.8-MC_1.18.2/src/main/java/com/github')
+                            //     .moveTo(src_main_java_com);
+
+                            const lib = archive.fetch('CoNLib-1.8-MC_1.18.2/com/github/chrisofnormandy/conlib/1.8/conlib-1.8-deobf.jar');
+                            lib.moveTo(archive.root.addDir('libs'));
+
+                            archive.root.deleteDir('CoNLib-1.8-MC_1.18.2');
+
+                            filemod.examplemod(archive, true)
+                                .then((o) => {
+                                    let state = this.state;
+
+                                    state.archive = o.archive;
+                                    state.modName = o.modName;
+                                    state.orgName = o.orgName;
+
+                                    this.builder = new Builder(state.orgName, state.modName);
+
+                                    this.setState(state, () => {
+                                        resolve(archive);
+                                    });
+                                })
+                                .catch(reject);
+                        })
+                        .catch(reject);
+                })
+                .catch(reject);
+        });
+    }
+
+    /**
+     *
+     * @param {*} full
+     */
     reload(full = false) {
         let state = this.state;
 
-        if (full && window.location.search.slice(1).split('&').includes('dev=true')) {
+        if (full && this.archive.root === null && window.location.search
+            .slice(1)
+            .split('&')
+            .includes('dev=true')
+        ) {
             this.archive.setRoot('My_Mod');
 
-            openForgeZip('1.18.2', '40.1.0', this.archive)
-                .then((archive) => {
-                    filemod.examplemod(archive, true)
-                        .then((o) => {
-                            state.archive = o.archive;
-                            state.modName = o.modName;
-                            state.orgName = o.orgName;
-
-                            this.builder = new Builder(state.orgName, state.modName);
-
-                            this.setState(state);
-                        })
-                        .catch((err) => console.error(err));
-                })
-                .catch((err) => console.error(err));
+            this.loadProject('1.18.2', '40.1.0', '1.8')
+                .then(console.debug)
+                .catch(console.error);
         }
+        else
+            this.setState(state);
+    }
+
+    loadCodeToEditor(code) {
+        let state = this.state;
+        state.code = code;
+        console.debug(code);
 
         this.setState(state);
+    }
+
+    getCodeFromEditor() {
+        return this.state.code;
     }
 
     componentDidMount() {
@@ -348,6 +415,8 @@ export default class ModBuilder extends React.Component {
                     <FileExplorer
                         archive={this.archive}
                         currentFile={this.current}
+                        loadCodeToEditor={this.loadCodeToEditor}
+                        getCodeFromEditor={this.getCodeFromEditor}
                     />
 
                     <div
@@ -359,22 +428,11 @@ export default class ModBuilder extends React.Component {
                             />
                         }
 
-                        <textarea
-                            id='txtArea'
-                            className='mod-builder-text-editor'
-                            onChange={
-                                (e) => {
-                                    if (this.current.file !== null && e.target.value !== this.current.text) {
-                                        document.getElementById('editor_save_button').classList.add('active');
-                                        document.getElementById('editor_discard_button').classList.add('active');
-                                    }
-                                    else if (e.target.value === this.current.text) {
-                                        document.getElementById('editor_save_button').classList.remove('active');
-                                        document.getElementById('editor_discard_button').classList.remove('active');
-                                    }
-                                }
-                            }
-                        />
+                        {
+                            this.current.fsfile !== null
+                                ? editor.createCodeEditor(this.state.code, this.current.fsfile.extname())
+                                : null
+                        }
 
                         <div
                             className='text-area-toolbar'
@@ -383,6 +441,7 @@ export default class ModBuilder extends React.Component {
                                 htmlFor='fileName'>
                                 File name:
                             </label>
+
                             <input
                                 type='text'
                                 name='fileName'
@@ -397,7 +456,7 @@ export default class ModBuilder extends React.Component {
 
                             <i
                                 id='editor_rename_button'
-                                className="icon bi-arrow-return-right editor-toolbar-icon icon-active"
+                                className='icon bi-arrow-return-right editor-toolbar-icon icon-active'
                                 title='Rename'
                                 onClick={
                                     () => {
@@ -413,7 +472,7 @@ export default class ModBuilder extends React.Component {
 
                             <i
                                 id='editor_save_button'
-                                className="icon bi-save editor-toolbar-icon"
+                                className='icon bi-save editor-toolbar-icon'
                                 title='Save'
                                 onClick={
                                     () => {
@@ -426,7 +485,7 @@ export default class ModBuilder extends React.Component {
 
                             <i
                                 id='editor_discard_button'
-                                className="icon bi-x-circle editor-toolbar-icon"
+                                className='icon bi-x-circle editor-toolbar-icon'
                                 title='Discard Changes'
                                 onClick={
                                     () => cancelChanges(this.current)
@@ -437,11 +496,9 @@ export default class ModBuilder extends React.Component {
 
                     {
                         this.builder !== null
-                            ? (
-                                <VertRibbon
-                                    content={this.getVerticalRibbonContent()}
-                                />
-                            )
+                            ? <VertRibbon
+                                content={this.getVerticalRibbonContent()}
+                            />
                             : null
                     }
 
@@ -648,7 +705,13 @@ export default class ModBuilder extends React.Component {
         this.builder = null;
 
         this.current = {
+            /**
+             * @type {File}
+             */
             file: null,
+            /**
+             * @type {import('../../common/file-system/FSFile').default}
+             */
             fsfile: null,
             path: '',
             text: ''
@@ -661,6 +724,44 @@ export default class ModBuilder extends React.Component {
             }
         };
 
+        /**
+         *
+         */
+        const downloadProject = () => {
+            this.archive.setRoot('My_Mod');
+
+            this.loadProject('1.18.2', '40.1.0', '1.8')
+                .then(console.debug)
+                .catch(console.error);
+        };
+
+        const openProject = () => {
+            const files = document.getElementById('zip_input').files;
+
+            if (files.length === 1) {
+                const zip = new JSZip();
+
+                const state = this.state;
+                let zipName = files.item(0).name;
+                state.archive.setRoot(zipName.slice(0, zipName.length - 4));
+
+                openZip(zip, state.archive, files.item(0))
+                    .then((archive) => {
+                        state.archive = archive;
+                        this.setState(state);
+                    })
+                    .catch((err) => console.error(err));
+            }
+            else {
+                console.log('No file selected.');
+            }
+        };
+
+        const saveFile = () => {
+            this.archive = save(this.archive, this.current);
+            this.reload();
+        };
+
         this.ribbonOptions = [
             {
                 id: 'option_file',
@@ -669,62 +770,27 @@ export default class ModBuilder extends React.Component {
                     {
                         text: 'New Project',
                         onClick() {
-                            const state = this.state;
-
-                            this.archive.setRoot('My_Mod');
-
-                            openForgeZip('1.18.2', '40.1.0', this.archive)
-                                .then((archive) => {
-                                    filemod.examplemod(archive)
-                                        .then((o) => {
-                                            state.archive = o.archive;
-                                            state.modName = o.modName;
-                                            state.orgName = o.orgName;
-
-                                            this.setState(state);
-                                        })
-                                        .catch((err) => console.error(err));
-                                })
-                                .catch((err) => console.error(err));
+                            downloadProject();
                         }
                     },
                     {
                         text: 'Open Project',
-                        body: (
+                        body:
                             <input
                                 type='file'
                                 id='zip_input'
                                 name='zip_input'
                                 accept='.zip'
                             />
-                        ),
+                        ,
                         onClick() {
-                            const files = document.getElementById('zip_input').files;
-
-                            if (files.length === 1) {
-                                const zip = new JSZip();
-
-                                const state = this.state;
-                                let zipName = files.item(0).name;
-                                state.archive.setRoot(zipName.slice(0, zipName.length - 4));
-
-                                openZip(zip, state.archive, files.item(0))
-                                    .then((archive) => {
-                                        state.archive = archive;
-                                        this.setState(state);
-                                    })
-                                    .catch((err) => console.error(err));
-                            }
-                            else {
-                                console.log('No file selected.');
-                            }
+                            openProject();
                         }
                     },
                     {
                         text: 'Save File',
                         onClick() {
-                            this.archive = save(this.archive, this.current);
-                            this.reload();
+                            saveFile();
                         }
                     },
                     {
@@ -737,7 +803,8 @@ export default class ModBuilder extends React.Component {
 
         this.state = {
             modName: '',
-            orgName: ''
+            orgName: '',
+            code: ''
         };
 
         /**
@@ -746,5 +813,7 @@ export default class ModBuilder extends React.Component {
         this.popupGroups = new Map();
 
         this.reload = this.reload.bind(this);
+        this.loadCodeToEditor = this.loadCodeToEditor.bind(this);
+        this.getCodeFromEditor = this.getCodeFromEditor.bind(this);
     }
 }

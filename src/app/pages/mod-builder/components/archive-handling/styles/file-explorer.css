@@ -1,11 +1,16 @@
 .filex-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  resize: horizontal;
 }
 
 .filex-list-wrapper {
   user-select: none;
   padding: 5px 15px;
+  overflow: auto;
+  height: 100%;
 }
 
 .filex-ribbon {
@@ -23,6 +28,8 @@
   width: 100%;
 
   border-left: 1px solid rgba(255, 255, 255, 0);
+
+  overflow: auto;
 }
 
 .filex-container:hover .filex-list {

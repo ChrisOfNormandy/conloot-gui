@@ -2,10 +2,12 @@
 import FSManager from '../../../common/file-system/FSManager';
 
 import { modify__buildGradle } from './files/base/build-gradle';
+import { modsToml } from './files/base/mods-toml';
+import { examplemod_java } from './replacers/examplemod';
 
-import * as stringUtil from '../../../common/string-util';
+// import * as stringUtil from '../../../common/string-util';
 
-const tabSize = 4;
+// const tabSize = 4;
 
 /**
  *
@@ -19,6 +21,7 @@ export function examplemod(archive, preset = false) {
         return Promise.reject(new Error('Failed to fetch file: \'src/main/java/com\''));
 
     let orgName, modName;
+
     if (!preset) {
         orgName = prompt('Organization (or your name)', 'myorg').toLowerCase() || 'myorg';
         modName = prompt('Mod name', 'MyMod').replace(/[^a-zA-Z0-9]/g, '') || 'MyMod';
@@ -28,46 +31,33 @@ export function examplemod(archive, preset = false) {
         modName = 'MyMod';
     }
 
+    const files = [
+        examplemod_java,
+        modify__buildGradle,
+        modsToml
+    ];
+
+    const iterateFiles = (archive, i = 0) => {
+        if (i === files.length)
+            return Promise.resolve(archive);
+
+        return new Promise((resolve, reject) => {
+            files[i](archive, orgName, modName)
+                .then((a) => iterateFiles(a, i + 1))
+                .then(resolve)
+                .catch(reject);
+        });
+    };
+
     return new Promise((resolve, reject) => {
-        let modMain = src_main_java_com
-            .getDir('example').rename(orgName)
-            .getDir('examplemod').rename(modName.toLowerCase())
-            .getFile('ExampleMod.java').rename(modName + '.java');
-
-        modMain.file.text()
-            .then((fileData) => {
-                let content = fileData;
-
-                // const tagOptions = { mod_name: modName, org_name: orgName };
-
-                // content = tags.replTags(content, tagOptions);
-
-                let constructBody = content.match(new RegExp(`public ${modName}\\(\\) {\n([^}]+)}`));
-
-                if (constructBody)
-                    content = content.replace(constructBody[1], `${' '.repeat(tabSize * 2)}// ##CON_TAG##\n${' '.repeat(tabSize)}`);
-
-                content = stringUtil.del(content, content.indexOf('private void setup'), content.indexOf('@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)'));
-
-                // Replace imports
-                // content = tags.replTags(content, tagOptions);
-                content = stringUtil.del(content, content.indexOf('import net.minecraft.block.Block;'), content.indexOf(`@Mod("${modName.toLowerCase()}")`));
-
-                // Add ModBlocks Init method to block registry event function
-
-                // Create and set file
-                modMain.file = new File([content], modMain.file.name, { type: modMain.file.type });
-
-                modify__buildGradle(archive, modName, orgName)
-                    .then((archive) => {
-                        resolve({
-                            archive,
-                            modName,
-                            orgName
-                        });
-                    })
-                    .catch((err) => reject(err));
+        iterateFiles(archive)
+            .then((a) => {
+                resolve({
+                    archive: a,
+                    modName,
+                    orgName
+                });
             })
-            .catch((err) => reject(err));
+            .catch(reject);
     });
 }
