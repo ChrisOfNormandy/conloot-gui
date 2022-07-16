@@ -1,0 +1,177 @@
+{
+    "air": {
+        "params": [],
+        "tip": "Defines the block as 'air' (duh)."
+    },
+    "color": {
+        "params": [
+            {
+                "type": "class_MaterialColor",
+                "default": null
+            }
+        ]
+    },
+    "destroyTime": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ],
+        "tip": "How long it takes to mine the block."
+    },
+    "dynamicShape": {
+        "params": []
+    },
+    "emissiveRendering": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ],
+        "tip": "Makes the block 'glow'."
+    },
+    "explosionResistance": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ],
+        "tip": "Sets the explosive resistance of a block (obsidian is 1200, stone is 6, dirt is 0.5; anything that breaks instantly by hand is 0)."
+    },
+    "friction": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ],
+        "tip": "How slippery the block is when walking on it."
+    },
+    "hasPostProcess": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ]
+    },
+    "instabreak": {
+        "params": [],
+        "tip": "Does the block break instantly when punched, like crops and plants?"
+    },
+    "isRedstoneConductor": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ],
+        "tip": "Does the block emit a redstone signal?"
+    },
+    "isSuffocating": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ],
+        "tip": "Will entities (players and mobs) take damage if they're encased in the block?"
+    },
+    "isValidSpawn": {
+        "params": [
+            {
+                "type": "class_StateArgumentPredicate",
+                "default": null
+            }
+        ],
+        "tip": "Provide what entities can spawn on this block, if able."
+    },
+    "isViewBlocking": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ],
+        "tip": "Can mobs see through this block? Even if the texture looks solid, they may be able to x-ray through it."
+    },
+    "jumpFactor": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ],
+        "tip": "How much bounce or 'stick' a block has (slime blocks, beds vs. honey blocks)."
+    },
+    "lightLevel": {
+        "params": [
+            {
+                "type": "class_ToIntFunction<BlockState>",
+                "default": null
+            }
+        ],
+        "tip": "What light level does this block emit? Torches are 14, glowstone is 15, sea pickles emit 6 when underwater."
+    },
+    "lootFrom": {
+        "params": [
+            {
+                "type": "class_Supplier<? extends Block>"
+            }
+        ]
+    },
+    "noCollission": {
+        "params": [],
+        "tip": "Can entities (players and mobs) walk through the block? Think cobwebs, plants and crops."
+    },
+    "noDrops": {
+        "params": [],
+        "tip": "Prevent the block from dropping anything when destroyed."
+    },
+    "noOcclusion": {
+        "params": []
+    },
+    "randomTicks": {
+        "params": [],
+        "tip": "Does the block tick randomly? Needed for 'growth' or behaviour that involves RNG."
+    },
+    "requiresCorrectToolForDrops": {
+        "params": [],
+        "tip": "Does the block need to be broken with its declared tool type to drop its item? Stone = pickaxe, dirt = shovel, etc."
+    },
+    "sound": {
+        "params": [
+            {
+                "type": "class_SoundType",
+                "default": null
+            }
+        ],
+        "tip": "What sound does the block make when interacted with?"
+    },
+    "speedFactor": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ],
+        "tip": "How much is an entity (player or mob) slowed or accelerated when walking on the block? Think soul sand."
+    },
+    "strength": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            },
+            {
+                "type": "float",
+                "default": null,
+                "optional": true
+            }
+        ],
+        "tip": "Break resistance. Dirt is 0.5, stone is 1.5, obsidian is 50. The first value is destroy time, second is explosion resistance."
+    }
+}

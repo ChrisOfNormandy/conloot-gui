@@ -1,10 +1,16 @@
-import BlockProperties from './BlockProperties';
+import { v4 } from 'uuid';
+import { BlockProperties_v18_2 } from './BlockProperties';
 
 import * as blockstates from './blockstates';
 
 export default class Block {
     getPropertiesString() {
-        return `Standard.create("${this.name}", Properties.copy(Blocks.STONE)${this.properties.toString()}, ItemGroup.TAB_BUILDING_BLOCKS);`;
+        return `Properties.copy(Blocks.STONE)${this.properties.toString()}`;
+    }
+
+    // eslint-disable-next-line class-methods-use-this
+    getItemGroupString() {
+        return 'CreativeModeTab.TAB_BUILDING_BLOCKS';
     }
 
     getBlockstate() {
@@ -13,11 +19,30 @@ export default class Block {
         }
     }
 
+    getStrings() {
+        return [
+            `%tab_2%// block<${this.uuid}>`,
+            `%tab_2%Standard.create("${this.name}", ${this.getPropertiesString()}, ${this.getItemGroupString()});`,
+            `%tab_2%// </${this.uuid}>`
+        ];
+    }
+
+    toString() {
+        return this.getStrings().join('\n');
+    }
+
+    /**
+     *
+     * @param {string} modName
+     * @param {string} name
+     */
     constructor(modName, name) {
+        this.uuid = v4();
+
         this.modName = modName;
         this.name = name;
 
-        this.properties = new BlockProperties();
+        this.properties = new BlockProperties_v18_2();
 
         this.modelType = 'full-block';
     }

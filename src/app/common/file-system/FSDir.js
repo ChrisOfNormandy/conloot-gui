@@ -5,7 +5,7 @@ export default class FSDir {
      *
      * @param {string} name
      * @param {File} file
-     * @returns
+     * @returns {FSFile}
      */
     addFile(name, file, overwrite = false) {
         let n = name;
@@ -56,6 +56,8 @@ export default class FSDir {
     addDir(name, dir = null, overwrite = false) {
         let n = name;
 
+        console.debug('Creating dir:', name);
+
         if (!!this.content[n] && !overwrite) {
             let i = 1;
             while (this.content[n]) {
@@ -85,6 +87,15 @@ export default class FSDir {
 
     /**
      *
+     * @param {string} name
+     * @returns
+     */
+    getOrAddDir(name) {
+        return this.getDir(name) || this.addDir(name);
+    }
+
+    /**
+     *
      * @param {name} name
      */
     deleteDir(name) {
@@ -101,7 +112,7 @@ export default class FSDir {
      * @returns {boolean}
      */
     contains(name) {
-        return !!this.content[name];
+        return this.content[name] !== undefined;
     }
 
     /**

@@ -1,8 +1,35 @@
 import React from 'react';
-import CodeEditor from '../../fragments/editor/CodeEditor';
 import Builder from './builders/Builder';
+import CodeEditor from '../../fragments/editor/CodeEditor';
+
+/**
+ *
+ * @param {string} str
+ * @returns
+ */
+function replTabs(str) {
+    const m = str.match(/%tab_(\d+)%/);
+    if (m)
+        return replTabs(str.replace(m[0], ' '.repeat(4 * m[1])));
+
+    return str;
+}
 
 class Editor {
+    tagRepl(str) {
+        let s = str;
+
+        Object.keys(this.tags).forEach((tag) => {
+            s = s.replace(new RegExp(`%${tag}%`, 'g'), this.tags[tag]);
+        });
+
+        this.replacers.forEach((repl) => {
+            s = repl(s);
+        });
+
+        return replTabs(s);
+    }
+
     createBuilder(orgName, modName) {
         this.builder = new Builder(orgName, modName);
 
@@ -39,6 +66,20 @@ class Editor {
         />;
     }
 
+    /**
+     *
+     * @returns {Object.<string, string>}
+     */
+    getLang() {
+        const lang = {};
+
+        this.builder.blocks.forEach((block) => {
+            lang[`block.${this.modName.toLowerCase()}.${block.name}`] = block.name.split('_').map((s) => s[0].toUpperCase() + s.slice(1)).join(' ');
+        });
+
+        return lang;
+    }
+
     constructor() {
         /**
          * @type {Builder}
@@ -53,6 +94,34 @@ class Editor {
             path: '',
             text: ''
         };
+
+        this.tags = {
+            org_name: () => this.builder.orgName,
+            mod_name: () => this.builder.modName,
+            mod_name_lc: () => this.builder.modName.toLowerCase()
+        };
+
+        this.replacers = [
+            /**
+             *
+             * @param {string} str
+             */
+            (str) => {
+                let s = str;
+
+                let m = str.match(/%tab_(\d+)%/);
+
+                while (m) {
+                    s = s.replace(m[1], ' '.repeat(m[1] * 4));
+
+                    m = s.match(/%tab_(\d+)%/);
+                }
+
+                return str;
+            }
+        ];
+
+        this.tagRepl = this.tagRepl.bind(this);
     }
 }
 

@@ -11,12 +11,12 @@ export default class BlockPreview extends React.Component {
                     className='block-preview'
                 >
                     {
-                        this.state.sides.map((side, i) => (
+                        this.state.sides.map((side, i) =>
                             <div
                                 key={i}
                                 className={`block-side bS-${i}`}
                             />
-                        ))
+                        )
                     }
                 </div>
             </div>

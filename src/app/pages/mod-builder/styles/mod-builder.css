@@ -61,3 +61,13 @@
   cursor: pointer;
   color: white;
 }
+
+.property-bundle {
+  display: flex;
+  flex-direction: column;
+}
+
+.property-row {
+  display: flex;
+  flex-direction: row;
+}

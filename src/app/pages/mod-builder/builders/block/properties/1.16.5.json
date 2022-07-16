@@ -1,0 +1,155 @@
+{
+    "air": {
+        "params": []
+    },
+    "color": {
+        "params": [
+            {
+                "type": "class_MaterialColor",
+                "default": null
+            }
+        ]
+    },
+    "destroyTime": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ]
+    },
+    "dynamicShape": {
+        "params": []
+    },
+    "emissiveRendering": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ]
+    },
+    "explosionResistance": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ]
+    },
+    "friction": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ]
+    },
+    "hasPostProcess": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ]
+    },
+    "isRedstoneConductor": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ]
+    },
+    "isSuffocating": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ]
+    },
+    "isValidSpawn": {
+        "params": [
+            {
+                "type": "class_StateArgumentPredicate",
+                "default": null
+            }
+        ]
+    },
+    "isViewBlocking": {
+        "params": [
+            {
+                "type": "class_StatePredicate",
+                "default": null
+            }
+        ]
+    },
+    "jumpFactor": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ]
+    },
+    "lightLevel": {
+        "params": [
+            {
+                "type": "class_ToIntFunction<BlockState>",
+                "default": null
+            }
+        ]
+    },
+    "lootFrom": {
+        "params": [
+            {
+                "type": "class_Supplier<? extends Block>"
+            }
+        ]
+    },
+    "noCollission": {
+        "params": []
+    },
+    "noDrops": {
+        "params": []
+    },
+    "noOcclusion": {
+        "params": []
+    },
+    "randomTicks": {
+        "params": []
+    },
+    "requiresCorrectToolForDrops": {
+        "params": []
+    },
+    "sound": {
+        "params": [
+            {
+                "type": "class_SoundType",
+                "default": null
+            }
+        ]
+    },
+    "speedFactor": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            }
+        ]
+    },
+    "strength": {
+        "params": [
+            {
+                "type": "float",
+                "default": null
+            },
+            {
+                "type": "float",
+                "default": null,
+                "optional": true
+            }
+        ]
+    }
+}

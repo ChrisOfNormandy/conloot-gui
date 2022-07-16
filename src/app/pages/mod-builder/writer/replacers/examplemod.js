@@ -1,3 +1,5 @@
+import editor from '../../editor';
+
 /**
  *
  * @param {FSManager} archive
@@ -35,10 +37,6 @@ export function examplemod_java(archive, orgName, modName) {
             .then((fileData) => {
                 let content = fileData;
 
-                // const tagOptions = { mod_name: modName, org_name: orgName };
-
-                // content = tags.replTags(content, tagOptions);
-
                 content = content
                     .replace(/examplemod/g, modName.toLowerCase());
                 content = content
@@ -46,21 +44,11 @@ export function examplemod_java(archive, orgName, modName) {
                 content = content
                     .replace(/example/, orgName.toLowerCase());
 
-                // let constructBody = content.match(new RegExp(`public ${modName}\\(\\) {\n([^}]+)}`));
+                content = content
+                    .replace('// Register a new block here', 'ModBlocks.Init();\n')
+                    .replace('HELLO from Register Block', 'Finished registering modded blocks. :)');
 
-                // if (constructBody)
-                //     content = content.replace(constructBody[1], `${' '.repeat(tabSize * 2)}// ##CON_TAG##\n${' '.repeat(tabSize)}`);
-
-                // content = stringUtil.del(content, content.indexOf('private void setup'), content.indexOf('@Mod.EventBusSubscriber(bus=Mod.EventBusSubscriber.Bus.MOD)'));
-
-                // Replace imports
-                // content = tags.replTags(content, tagOptions);
-                // content = stringUtil.del(content, content.indexOf('import net.minecraft.block.Block;'), content.indexOf(`@Mod("${modName.toLowerCase()}")`));
-
-                // Add ModBlocks Init method to block registry event function
-
-                // Create and set file
-                modMain.write(content);
+                modMain.write(editor.tagRepl(content));
 
                 resolve(archive);
             })

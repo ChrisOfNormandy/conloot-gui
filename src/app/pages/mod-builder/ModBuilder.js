@@ -1,7 +1,6 @@
 import React from 'react';
 import JSZip from 'jszip';
 import editor from './editor';
-import Builder from './builders/Builder';
 import Ribbon from '../../fragments/ribbons/Ribbon';
 import FSManager from '../../common/file-system/FSManager';
 import VertRibbon from '../../fragments/ribbons/VertRibbon';
@@ -17,6 +16,10 @@ import * as FileWriter from './writer/writers';
 import './styles/mod-builder.css';
 import './styles/block-preview.css';
 import './styles/content-popup.css';
+import { langEnUS } from './writer/files/base/lang_en-us';
+import { blockstate } from './writer/files/base/blockstate';
+import { blockItemModel, blockModel } from './writer/files/base/model';
+import { blockLootTable } from './writer/files/base/loot-table';
 
 /**
  *
@@ -232,12 +235,28 @@ export default class ModBuilder extends React.Component {
      * @param {*} groupName
      * @returns
      */
+    // eslint-disable-next-line class-methods-use-this
     blockProperties(groupName) {
-        console.log(groupName, this.builder.blocks);
+        let properties = editor.builder.blocks.get(groupName).properties.values;
 
-        let properties = this.builder.blocks.get(groupName).properties.values;
+        const getType = (param) => {
+            if (/class_/.test(param.type))
+                return {
+                    type: 'text',
+                    disabled: true
+                };
 
-        const getType = (key) => this.builder.blocks.get(groupName).properties.values[key].type;
+            if (param.type === 'float')
+                return {
+                    type: 'number',
+                    min: 0,
+                    defaultValue: param.default || 0
+                };
+
+            return {
+                type: 'text'
+            };
+        };
 
         const booleans = [];
         const texts = [];
@@ -264,57 +283,85 @@ export default class ModBuilder extends React.Component {
                                 {key}
                             </label>
 
-                            <input
-                                id={`block_property_input_${key}`}
-                                name='block_property_input_a'
-                                className='content-popup-form-input'
-                                type={
-                                    getType(key) === 'number'
-                                        ? 'number'
-                                        : getType(key) === 'boolean'
-                                            ? 'checkbox'
-                                            : 'text'
-                                }
-                                placeholder={key}
-                                defaultValue={properties[key].value}
-                                onKeyPress={
-                                    (e) => {
-                                        if (!/[a-z0-9-_]/.test(e.key))
-                                            e.preventDefault();
-                                    }
-                                }
-                                onChange={
-                                    (e) => {
-                                        let property = this.builder.blocks.get(groupName).properties.values[key];
+                            {
+                                properties[key].params.length
+                                    ? <div
+                                        className='property-bundle'
+                                    >
+                                        {
+                                            properties[key].params.map((param, i) =>
+                                                <span
+                                                    key={i}
+                                                    className='property-row'
+                                                >
+                                                    <input
+                                                        id={`block_property_input_${key}`}
+                                                        name='block_property_input_a'
+                                                        className='content-popup-form-input'
+                                                        {...getType(param)}
+                                                        placeholder={param.type}
+                                                        onKeyPress={
+                                                            (e) => {
+                                                                if (!/[a-z0-9-_]/.test(e.key))
+                                                                    e.preventDefault();
+                                                            }
+                                                        }
+                                                        onChange={
+                                                            (e) => {
+                                                                let property = editor.builder.blocks.get(groupName).properties.values[key];
 
-                                        if (property.type !== 'boolean')
-                                            property.value = e.target.value;
-                                        else
-                                            property.value = e.target.checked;
-                                    }
-                                }
-                            />
+                                                                property.enabled = true;
+
+                                                                param.value = e.target.value;
+                                                            }
+                                                        }
+                                                    />
+
+                                                    <button
+                                                        onClick={
+                                                            () => {
+                                                                let property = editor.builder.blocks.get(groupName).properties.values[key];
+
+                                                                property.enabled = false;
+                                                            }
+                                                        }
+                                                    >
+                                                        <i
+                                                            className='icon bi bi-x-lg'
+                                                        />
+                                                    </button>
+                                                </span>
+                                            )
+                                        }
+                                    </div>
+                                    : <input
+                                        key={i}
+                                        id={`block_property_input_${key}`}
+                                        name='block_property_input_a'
+                                        className='content-popup-form-input'
+                                        type='checkbox'
+                                        onChange={
+                                            (e) => {
+                                                let property = editor.builder.blocks.get(groupName).properties.values[key];
+
+                                                property.enabled = e.target.checked;
+                                            }
+                                        }
+                                    />
+                            }
 
                             {
-                                properties[key].value !== null
-                                    ?
-                                    <i
+                                properties[key].tip
+                                    ? <i
                                         className='icon bi bi-info content-popup-icon'
-                                        title={properties[key].toString()}
+                                        title={properties[key].tip}
                                     />
-
-                                    :
-                                    <i
-                                        className='icon bi bi-info content-popup-icon'
-                                        title={properties[key].type}
-                                    />
-
+                                    : null
                             }
                         </div>
                     )
                 }
-            </form>
-            ;
+            </form>;
 
         return (
             <div className='content-popup-body row'>
@@ -346,8 +393,6 @@ export default class ModBuilder extends React.Component {
                                     state.archive = o.archive;
                                     state.modName = o.modName;
                                     state.orgName = o.orgName;
-
-                                    this.builder = new Builder(state.orgName, state.modName);
 
                                     this.setState(state, () => {
                                         resolve(archive);
@@ -495,7 +540,7 @@ export default class ModBuilder extends React.Component {
                     </div>
 
                     {
-                        this.builder !== null
+                        editor.builder !== null
                             ? <VertRibbon
                                 content={this.getVerticalRibbonContent()}
                             />
@@ -512,23 +557,60 @@ export default class ModBuilder extends React.Component {
         const addBlock = () => {
             let blockName = 'new_block';
             let i = 1;
-            while (this.builder.blocks.has(blockName)) {
+            while (editor.builder.blocks.has(blockName)) {
                 blockName = `new_block_${i}`;
                 i++;
             }
 
             this.addPopup(blockName, 'Builder', this.blockBuilder(blockName, blockName));
-            this.builder.addBlock(blockName);
+            editor.builder.addBlock(blockName);
         };
-        const getBlocks = () => this.builder.getAllBlocks();
-        const writeBlocks = () => {
-            const filePath = this.builder.getBlockPath();
-            const file = this.archive.fetch(filePath);
-            const arr = Array.from(this.builder.getAllBlocks().values()).map((b) => b.toString());
 
-            FileWriter.write(file, arr)
-                .then(() => console.log('Success'))
-                .catch((err) => console.error(err));
+        const getBlocks = () => editor.builder.getAllBlocks();
+
+        const writeBlocks = () => {
+            const filePath = editor.builder.getBlockPath();
+            const file = this.archive.fetch(filePath);
+
+            const blockList = editor.builder.getBlockArray();
+
+            FileWriter.write(file, blockList)
+                .then(() => {
+                    langEnUS(this.archive, editor.organization, editor.modName, JSON.stringify(editor.getLang(), null, 4))
+                        .then((archive) => {
+                            console.debug('Finished writing shared asset files.');
+
+                            const iterate = (archive, i = 0) => {
+                                if (i >= blockList.length)
+                                    return Promise.resolve(archive);
+
+                                return new Promise((resolve, reject) => {
+                                    blockstate(archive, blockList[i].name, 'minecraft', 'deepslate')
+                                        .then((a) => {
+                                            blockModel(a, blockList[i].name, 'minecraft', 'deepslate')
+                                                .then((a) => {
+                                                    blockItemModel(a, blockList[i].name)
+                                                        .then(() => {
+                                                            blockLootTable(a, blockList[i].name, { namespace: 'minecraft', blockName: 'sponge' })
+                                                                .then((a) => iterate(a, i + 1).then(resolve).catch(reject))
+                                                                .catch(reject);
+                                                        })
+                                                        .catch(reject);
+                                                })
+                                                .catch(reject);
+                                        })
+                                        .catch(reject);
+                                });
+                            };
+
+                            iterate(archive)
+                                .then(console.debug)
+                                .catch(console.error);
+                        })
+                        .catch(console.error);
+
+                })
+                .catch(console.error);
         };
         const addPopup = (name) => {
             this.addPopup(name, 'Builder', this.blockBuilder(name, name));
@@ -566,20 +648,20 @@ export default class ModBuilder extends React.Component {
                             addBlock();
                         }
                     },
-                    {
-                        text: 'Example 2',
-                        onClick() {
-                            console.log('New Block');
-                        }
-                    },
-                    {
-                        text: 'Example 3',
-                        onClick() {
-                            console.log('New Block');
-                        }
-                    }
+                    // {
+                    //     text: 'Example 2',
+                    //     onClick() {
+                    //         console.log('New Block');
+                    //     }
+                    // },
+                    // {
+                    //     text: 'Example 3',
+                    //     onClick() {
+                    //         console.log('New Block');
+                    //     }
+                    // }
                 ],
-                contextMenuContent: Array.from(this.builder.blocks.values()).map((block) => (
+                contextMenuContent: Array.from(editor.builder.blocks.values()).map((block) => (
                     {
                         text: block.name,
                         onClick() {
@@ -702,7 +784,7 @@ export default class ModBuilder extends React.Component {
         /**
          * @type {Builder}
          */
-        this.builder = null;
+        editor.builder = null;
 
         this.current = {
             /**

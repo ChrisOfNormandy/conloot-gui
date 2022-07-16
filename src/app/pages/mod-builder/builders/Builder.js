@@ -18,10 +18,19 @@ export default class Builder {
         return this.blocks;
     }
 
+    getBlockArray() {
+        return Array.from(this.blocks.values());
+    }
+
     getBlockPath() {
         return `src/main/java/com/${this.orgName}/${this.modName}/ModBlocks.java`;
     }
 
+    /**
+     *
+     * @param {string} orgName
+     * @param {string} modName
+     */
     constructor(orgName, modName) {
         this.orgName = orgName.toLowerCase();
         this.modName = modName.toLowerCase();

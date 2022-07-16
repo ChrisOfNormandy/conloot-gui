@@ -270,3 +270,18 @@ export function fetchLibrary(mcVersion, libraryVersion) {
             .catch((err) => reject(err));
     });
 }
+
+/**
+ *
+ * @param {*} category
+ * @param {*} name
+ * @returns
+ */
+export function fetchTexture(category, name) {
+    return new Promise((resolve, reject) => {
+        fetch(`https://github.com/ChrisOfNormandy/mc-data-cache/raw/master/vanilla/assets/textures/${category}/${name}.png`)
+            .then((response) => response.blob())
+            .then(resolve)
+            .catch(reject);
+    });
+}

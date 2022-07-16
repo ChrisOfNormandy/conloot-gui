@@ -8,6 +8,9 @@ import './styles/popup-manager.css';
 export default class PopupManager extends React.Component {
 
     changeTab(name) {
+        console.debug('Changing tab to:', name);
+        console.debug(this.popupGroups);
+
         let state = this.state;
 
         state.openGroup = null;
@@ -40,84 +43,79 @@ export default class PopupManager extends React.Component {
 
         const getPopups = (group) => Array.from(group.popups.values()).filter((v) => v.open);
 
-        return (
+        return <div
+            className='popup-manager-container'
+        >
             <div
-                className='popup-manager-container'
+                className='popup-manager-ribbon'
             >
                 <div
-                    className='popup-manager-ribbon'
+                    className='popup-tabs-container'
                 >
-                    <div
-                        className='popup-tabs-container'
-                    >
-                        {
-                            groups.map((group, i) => (
+                    {
+                        groups.map((group, i) =>
+                            <div
+                                key={i}
+                                className='popup-tab-wrapper'
+                            >
                                 <div
-                                    key={i}
-                                    className='popup-tab-wrapper'
-                                >
-                                    <div
-                                        className='popup-tab'
-                                        onClick={
-                                            () => {
-                                                this.changeTab(group.name);
-                                            }
+                                    className='popup-tab'
+                                    onClick={
+                                        () => {
+                                            this.changeTab(group.name);
                                         }
-                                    >
-                                        {group.name}
-                                    </div>
-
-                                    <div
-                                        className='popup-tab-counter'
-                                    >
-                                        {group.popups.size}
-                                    </div>
-
-                                    {
-                                        group.open
-                                            ? (
-                                                <div
-                                                    className='popup-tab-group'
-                                                >
-                                                    <div
-                                                        className='popup-collection'
-                                                    >
-                                                        {
-                                                            getPopups(group).map((popup, i) => (
-                                                                <Popup
-                                                                    key={i}
-                                                                    title={popup.title}
-                                                                    body={popup.body}
-                                                                    onMinimize={popup.onMinimize}
-                                                                    onClose={popup.onClose}
-                                                                />
-                                                            ))
-                                                        }
-                                                    </div>
-                                                </div>
-                                            )
-                                            : null
                                     }
+                                >
+                                    {group.name}
                                 </div>
-                            ))
-                        }
-                    </div>
 
-                    <div
-                        className='popup-manager-ribbon-controls'
-                    >
-                        <i
-                            className='icon bi bi-dash-circle'
-                        />
+                                <div
+                                    className='popup-tab-counter'
+                                >
+                                    {group.popups.size}
+                                </div>
 
-                        <i
-                            className='icon bi bi-x-circle'
-                        />
-                    </div>
-
+                                {
+                                    group.open
+                                        ? <div
+                                            className='popup-tab-group'
+                                        >
+                                            <div
+                                                className='popup-collection'
+                                            >
+                                                {
+                                                    getPopups(group).map((popup, i) =>
+                                                        <Popup
+                                                            key={i}
+                                                            title={popup.title}
+                                                            body={popup.body}
+                                                            onMinimize={popup.onMinimize}
+                                                            onClose={popup.onClose}
+                                                        />
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                        : null
+                                }
+                            </div>
+                        )
+                    }
                 </div>
-            </div >
-        );
+
+                <div
+                    className='popup-manager-ribbon-controls'
+                >
+                    <i
+                        className='icon bi bi-dash-circle'
+                    />
+
+                    <i
+                        className='icon bi bi-x-circle'
+                    />
+                </div>
+            </div>
+        </div>;
     }
 
     constructor(props) {

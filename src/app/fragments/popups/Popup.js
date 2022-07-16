@@ -3,6 +3,11 @@ import React from 'react';
 
 import './styles/popup.css';
 
+/**
+ *
+ * @param {*} param0
+ * @returns
+ */
 export function Popup({ title, body = null, onMinimize = () => { }, onClose = () => { } }) {
     return (
         <div

@@ -1,8 +1,11 @@
 // eslint-disable-next-line no-unused-vars
 import FSManager from '../../../common/file-system/FSManager';
+import editor from '../editor';
 
 import { modify__buildGradle } from './files/base/build-gradle';
+import { langEnUS } from './files/base/lang_en-us';
 import { modsToml } from './files/base/mods-toml';
+import { modBlocks } from './files/modded/mod-blocks';
 import { examplemod_java } from './replacers/examplemod';
 
 // import * as stringUtil from '../../../common/string-util';
@@ -31,10 +34,14 @@ export function examplemod(archive, preset = false) {
         modName = 'MyMod';
     }
 
+    editor.createBuilder(orgName, modName);
+
     const files = [
         examplemod_java,
         modify__buildGradle,
-        modsToml
+        modsToml,
+        modBlocks,
+        langEnUS
     ];
 
     const iterateFiles = (archive, i = 0) => {
@@ -50,14 +57,16 @@ export function examplemod(archive, preset = false) {
     };
 
     return new Promise((resolve, reject) => {
+        const onComplete = (a) => {
+            resolve({
+                archive: a,
+                modName,
+                orgName
+            });
+        };
+
         iterateFiles(archive)
-            .then((a) => {
-                resolve({
-                    archive: a,
-                    modName,
-                    orgName
-                });
-            })
+            .then(onComplete)
             .catch(reject);
     });
 }
